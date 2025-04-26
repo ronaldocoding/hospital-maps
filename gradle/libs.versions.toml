@@ -13,7 +13,7 @@ mapboxMapsCompose = "11.11.0"
 googlePlacesVersion = "4.1.0"
 secretsGradlePlugin = "2.0.1"
 playServicesLocation = "21.3.0"
-koinVersion = "4.1.0"
+koinVersion = "4.1.0-Beta7"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
