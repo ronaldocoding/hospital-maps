@@ -48,7 +48,8 @@ class HospitalRepository(
                             locationHelper.latitude = it?.location?.latitude ?: 0.0
                             HospitalData(
                                 name = it?.displayName ?: "",
-                                location = locationHelper
+                                latitude = locationHelper.latitude,
+                                longitude = locationHelper.longitude
                             )
                         }
                     )
