@@ -55,8 +55,12 @@ dependencies {
     implementation(libs.mapbox.maps.compose)
     implementation(libs.google.places)
     implementation(libs.play.services.location)
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+    implementation(libs.koin.androidx.compose.navigation)
 
     testImplementation(libs.junit)
+    testImplementation(libs.koin.test)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
