@@ -18,7 +18,7 @@ class LocationRepository(
     private val locationProviderClient: FusedLocationProviderClient,
     private val context: Context
 ) {
-    fun getLastLocation(): Flow<Location> = callbackFlow {
+    fun getUserLastLocation(): Flow<Location> = callbackFlow {
         if (hasNotLocationPermissions()) throw SecurityException(
             "The permissions ACCESS_COARSE_LOCATION and ACCESS_FINE_LOCATION are required"
         )
@@ -29,7 +29,6 @@ class LocationRepository(
             }.addOnFailureListener {
                 close(it)
             }
-
         awaitClose()
     }.flowOn(Dispatchers.IO)
 
