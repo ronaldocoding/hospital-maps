@@ -54,6 +54,7 @@ dependencies {
     implementation(libs.mapbox.maps.android)
     implementation(libs.mapbox.maps.compose)
     implementation(libs.google.places)
+    implementation(libs.play.services.location)
 
     testImplementation(libs.junit)
 

@@ -12,6 +12,7 @@ mapboxMapsAndroid = "11.11.0"
 mapboxMapsCompose = "11.11.0"
 googlePlacesVersion = "4.1.0"
 secretsGradlePlugin = "2.0.1"
+playServicesLocation = "21.3.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -32,6 +33,7 @@ mapbox-maps-android = { group = "com.mapbox.maps", name = "android", version.ref
 mapbox-maps-compose = { group = "com.mapbox.extension", name = "maps-compose", version.ref = "mapboxMapsCompose" }
 google-places = { group = "com.google.android.libraries.places", name = "places", version.ref = "googlePlacesVersion" }
 secrets-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
+play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
