@@ -53,6 +53,8 @@ gen-external-apklibs
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
+.idea/**/deploymentTargetSelector.xml
+.idea/deploymentTargetSelector.xml
 
 # AWS User-specific
 .idea/**/aws.xml
