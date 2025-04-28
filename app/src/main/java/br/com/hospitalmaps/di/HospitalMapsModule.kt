@@ -1,6 +1,5 @@
 package br.com.hospitalmaps.di
 
-import br.com.hospitalmaps.BuildConfig
 import br.com.hospitalmaps.data.repository.HospitalRepository
 import br.com.hospitalmaps.data.repository.LocationRepository
 import br.com.hospitalmaps.domain.usecase.GetNearestHospitalUseCase
@@ -19,5 +18,3 @@ val hospitalMapsModule = module {
     factory { GetNearestHospitalUseCase(hospitalRepository = get()) }
     viewModel { MainViewModel(getNearestHospitalUseCase = get()) }
 }
-
-private fun providePlacesApiKey() = BuildConfig.PLACES_API_KEY
