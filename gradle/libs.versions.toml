@@ -14,6 +14,7 @@ googlePlacesVersion = "4.1.0"
 secretsGradlePlugin = "2.0.1"
 playServicesLocation = "21.3.0"
 koinVersion = "4.1.0-Beta7"
+accompanist = "0.32.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -39,6 +40,7 @@ koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = 
 koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koinVersion" }
 koin-androidx-compose-navigation = { group = "io.insert-koin", name = "koin-androidx-compose-navigation", version.ref = "koinVersion" }
 koin-test = { group = "io.insert-koin", name = "koin-test-junit4", version.ref = "koinVersion" }
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

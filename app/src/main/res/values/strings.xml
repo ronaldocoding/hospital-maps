@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Hospital Maps</string>
+
+    <!-- Location Screen -->
+    <string name="approximate_location_title">Precisamos acessar sua localização</string>
+    <string name="approximate_location_description">Sua localização é necessária para nós encontramos os hospitais mais próximos de você e exibirmos rotas para eles</string>
+    <string name="approximate_location_button_label">Permitir</string>
+    <string name="precise_location_title">Precisamos acessar sua localização exata</string>
+    <string name="precise_location_description">Sua localização exata é necessária para nós encontramos os hospitais mais próximos de você e exibirmos rotas para eles de forma precisa</string>
+    <string name="precise_location_button_label">Permitir</string>
+    <string name="precise_location_open_config_title">Precisamos acessar sua localização exata</string>
+    <string name="precise_location_open_config_description">Sua localização exata é necessária para nós encontramos os hospitais mais próximos de você e exibirmos rotas para eles de forma precisa. Por favor, abra as configurações e permita a localização exata.</string>
+    <string name="precise_location_open_config_button_label">Abrir configurações</string>
 </resources>
