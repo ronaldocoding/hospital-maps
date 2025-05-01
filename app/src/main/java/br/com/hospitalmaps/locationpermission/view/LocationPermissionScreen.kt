@@ -56,9 +56,9 @@ fun LocationPermissionScreen() {
     }
 
     val fineLocationPermissionState = rememberMultiplePermissionsState(
-        listOf(
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION
+        permissions = listOf(
+            COARSE_LOCATION,
+            FINE_LOCATION
         ),
         onPermissionsResult = { permissionMap ->
             val areGranted = permissionMap.values.reduce { acc, next ->
