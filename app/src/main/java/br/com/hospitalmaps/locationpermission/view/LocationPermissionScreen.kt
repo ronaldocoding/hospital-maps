@@ -1,8 +1,10 @@
 package br.com.hospitalmaps.locationpermission.view
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
-import android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS
+import android.net.Uri
+import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -80,7 +82,7 @@ fun LocationPermissionScreen() {
                     description = R.string.precise_location_open_config_description,
                     buttonLabel = R.string.precise_location_open_config_button_label,
                     onButtonClick = {
-                        context.startActivity(Intent(ACTION_LOCATION_SOURCE_SETTINGS))
+                        openAppDetailsSettings(context)
                     }
                 )
             }
@@ -101,6 +103,13 @@ fun LocationPermissionScreen() {
             }
         }
     }
+}
+
+private fun openAppDetailsSettings(context: Context) {
+    val intent = Intent(ACTION_APPLICATION_DETAILS_SETTINGS)
+    val uri = Uri.fromParts("package", context.packageName, null)
+    intent.setData(uri)
+    context.startActivity(intent)
 }
 
 
