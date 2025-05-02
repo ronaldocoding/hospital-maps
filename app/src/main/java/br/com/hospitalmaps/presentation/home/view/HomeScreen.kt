@@ -1,5 +1,6 @@
 package br.com.hospitalmaps.presentation.home.view
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeContentPadding
@@ -19,11 +20,13 @@ import com.google.maps.android.compose.rememberMarkerState
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(onBackButtonClick: () -> Unit) {
     val viewModel: HomeViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     viewModel.getUserLocation()
+
+    BackHandler { onBackButtonClick.invoke() }
 
     Box(
         modifier = Modifier
