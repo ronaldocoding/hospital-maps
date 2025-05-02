@@ -18,6 +18,8 @@ accompanist = "0.32.0"
 composeNavigationVersion = "2.8.9"
 kotlinSerialization = "2.0.21"
 kotlinxSerializationJson = "1.7.3"
+googleMapsCompose = "6.4.1"
+playServicesMaps = "18.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -46,6 +48,8 @@ koin-androidx-compose-navigation = { group = "io.insert-koin", name = "koin-andr
 koin-test = { group = "io.insert-koin", name = "koin-test-junit4", version.ref = "koinVersion" }
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+google-maps-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "googleMapsCompose" }
+play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -11,7 +11,7 @@ import org.koin.core.context.startKoin
 class HospitalMapsApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        Places.initializeWithNewPlacesApiEnabled(applicationContext, BuildConfig.PLACES_API_KEY)
+        Places.initializeWithNewPlacesApiEnabled(applicationContext, BuildConfig.MAPS_PLATFORM_API_KEY)
         startKoin {
             androidLogger()
             androidContext(this@HospitalMapsApplication)

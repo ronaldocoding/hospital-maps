@@ -43,7 +43,7 @@ private const val FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun LocationPermissionScreen() {
+fun LocationPermissionScreen(onLocationPermissionGranted: () -> Unit) {
     val context = LocalContext.current
     val viewModel: LocationPermissionViewModel = koinViewModel()
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
@@ -98,9 +98,7 @@ fun LocationPermissionScreen() {
                 )
             }
 
-            else -> {
-                // TODO: Navigate to the next screen
-            }
+            else -> onLocationPermissionGranted.invoke()
         }
     }
 }
