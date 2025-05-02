@@ -27,9 +27,8 @@ class HospitalRepository(
 ) {
     fun getNearbyHospitals(): Flow<List<HospitalData>> = callbackFlow {
         val placeFields = listOf(Place.Field.DISPLAY_NAME, Place.Field.LOCATION)
-        val userLocation = locationRepository.getUserLastLocation().map {
-            UserLocation(it.latitude, it.longitude)
-        }.first()
+        val userLastLocation = locationRepository.getUserLastLocation().first()
+        val userLocation = UserLocation(userLastLocation.latitude, userLastLocation.longitude)
         val center = LatLng(userLocation.latitude, userLocation.longitude)
         val circle = CircularBounds.newInstance(center, RADIUS_SEARCH)
         val includedTypes = listOf(HOSPITAL_TYPE)
@@ -48,10 +47,11 @@ class HospitalRepository(
                             locationHelper.latitude = it?.location?.latitude ?: 0.0
                             HospitalData(
                                 name = it?.displayName ?: "",
+                                longitude = locationHelper.longitude,
                                 latitude = locationHelper.latitude,
-                                longitude = locationHelper.longitude
+                                distanceFromUser = userLastLocation.distanceTo(locationHelper)
                             )
-                        }
+                        }.sortedBy { it.distanceFromUser }
                     )
                 }
                     .onFailure { close(it) }
