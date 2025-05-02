@@ -3,6 +3,7 @@ package br.com.hospitalmaps.presentation.locationpermission.view
 import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import androidx.annotation.StringRes
@@ -29,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.com.hospitalmaps.R
 import br.com.hospitalmaps.presentation.locationpermission.viewmodel.LocationPermissionViewModel
@@ -55,6 +57,15 @@ fun LocationPermissionScreen(onLocationPermissionGranted: () -> Unit) {
             isApproximateGranted = approximateLocationPermissionState.status.isGranted,
             isPreciseGranted = preciseLocationPermissionState.status.isGranted
         )
+    }
+
+    LifecycleResumeEffect(Unit) {
+        if (hasLocationPermissions(context)) {
+            onLocationPermissionGranted.invoke()
+        }
+        onPauseOrDispose {
+            // Does nothing
+        }
     }
 
     val fineLocationPermissionState = rememberMultiplePermissionsState(
@@ -158,6 +169,10 @@ private fun LocationPermissionContent(
     }
 }
 
+private fun hasLocationPermissions(context: Context): Boolean {
+    return context.checkSelfPermission(COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+            context.checkSelfPermission(FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+}
 
 @Preview(showBackground = true)
 @Composable
