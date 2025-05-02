@@ -1,4 +1,4 @@
-package br.com.hospitalmaps.locationpermission.view
+package br.com.hospitalmaps.presentation.locationpermission.view
 
 import android.Manifest
 import android.content.Context
@@ -31,7 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.com.hospitalmaps.R
-import br.com.hospitalmaps.locationpermission.viewmodel.LocationPermissionViewModel
+import br.com.hospitalmaps.presentation.locationpermission.viewmodel.LocationPermissionViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState

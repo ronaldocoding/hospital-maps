@@ -1,9 +1,9 @@
-package br.com.hospitalmaps.view.viewmodel
+package br.com.hospitalmaps.presentation.main.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import br.com.hospitalmaps.domain.usecase.GetNearestHospitalUseCase
-import br.com.hospitalmaps.view.state.MainUiState
+import br.com.hospitalmaps.presentation.main.state.MainUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

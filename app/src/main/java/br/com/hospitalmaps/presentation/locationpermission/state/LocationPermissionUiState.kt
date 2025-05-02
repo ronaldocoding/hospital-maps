@@ -1,4 +1,4 @@
-package br.com.hospitalmaps.locationpermission.state
+package br.com.hospitalmaps.presentation.locationpermission.state
 
 data class LocationPermissionUiState(
     val isApproximateGranted: Boolean = false,

@@ -1,4 +1,4 @@
-package br.com.hospitalmaps.view.state
+package br.com.hospitalmaps.presentation.main.state
 
 import br.com.hospitalmaps.domain.model.HospitalData
 

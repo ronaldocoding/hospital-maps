@@ -1,8 +1,7 @@
-package br.com.hospitalmaps.locationpermission.viewmodel
+package br.com.hospitalmaps.presentation.locationpermission.viewmodel
 
-import android.text.BoringLayout
 import androidx.lifecycle.ViewModel
-import br.com.hospitalmaps.locationpermission.state.LocationPermissionUiState
+import br.com.hospitalmaps.presentation.locationpermission.state.LocationPermissionUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
