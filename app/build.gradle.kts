@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.koin.androidx.compose.navigation)
     implementation(libs.accompanist.permissions)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.junit)
     testImplementation(libs.koin.test)
