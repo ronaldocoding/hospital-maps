@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,11 +34,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.com.hospitalmaps.R
+import br.com.hospitalmaps.presentation.locationpermission.action.LocationPermissionAction
+import br.com.hospitalmaps.presentation.locationpermission.state.LocationPermissionUiState
 import br.com.hospitalmaps.presentation.locationpermission.viewmodel.LocationPermissionViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.google.accompanist.permissions.rememberPermissionState
 import org.koin.androidx.compose.koinViewModel
 
 private const val COARSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION
@@ -49,22 +50,26 @@ fun LocationPermissionScreen(onLocationPermissionGranted: () -> Unit) {
     val context = LocalContext.current
     val viewModel: LocationPermissionViewModel = koinViewModel()
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
-    val approximateLocationPermissionState = rememberPermissionState(COARSE_LOCATION)
-    val preciseLocationPermissionState = rememberPermissionState(FINE_LOCATION)
 
     LaunchedEffect(Unit) {
-        viewModel.onInit(
-            isApproximateGranted = approximateLocationPermissionState.status.isGranted,
-            isPreciseGranted = preciseLocationPermissionState.status.isGranted
+        viewModel.onAction(
+            LocationPermissionAction.OnInit(
+                isApproximateGranted = hasApproximateLocationPermission(context),
+                isPreciseGranted = hasPreciseLocationPermission(context)
+            )
         )
     }
 
     LifecycleResumeEffect(Unit) {
         if (hasLocationPermissions(context)) {
             onLocationPermissionGranted.invoke()
+        } else if (uiState.value is LocationPermissionUiState.Paused) {
+            viewModel.onAction(LocationPermissionAction.OnPermissionsDenied)
         }
         onPauseOrDispose {
-            // Does nothing
+            if (uiState.value is LocationPermissionUiState.Denied) {
+                viewModel.onAction(LocationPermissionAction.OnPause)
+            }
         }
     }
 
@@ -78,16 +83,25 @@ fun LocationPermissionScreen(onLocationPermissionGranted: () -> Unit) {
                 acc && next
             }
             if (areGranted) {
-                viewModel.setPermissionsAsGranted()
+                viewModel.onAction(LocationPermissionAction.OnPermissionsGranted)
             } else {
-                viewModel.setPermissionsAsDenied()
+                viewModel.onAction(LocationPermissionAction.OnPermissionsDenied)
             }
         }
     )
 
     Box(modifier = Modifier.safeContentPadding()) {
-        when {
-            uiState.value.areAllPermissionsDenied -> {
+        when (uiState.value) {
+            is LocationPermissionUiState.Loading, LocationPermissionUiState.Paused -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+
+            is LocationPermissionUiState.Denied -> {
                 LocationPermissionContent(
                     title = R.string.precise_location_open_config_title,
                     description = R.string.precise_location_open_config_description,
@@ -98,7 +112,7 @@ fun LocationPermissionScreen(onLocationPermissionGranted: () -> Unit) {
                 )
             }
 
-            uiState.value.isApproximateGranted.not() || uiState.value.isPreciseGranted.not() -> {
+            is LocationPermissionUiState.RequestPermission -> {
                 LocationPermissionContent(
                     title = R.string.precise_location_title,
                     description = R.string.precise_location_description,
@@ -109,7 +123,7 @@ fun LocationPermissionScreen(onLocationPermissionGranted: () -> Unit) {
                 )
             }
 
-            else -> onLocationPermissionGranted.invoke()
+            is LocationPermissionUiState.Granted -> onLocationPermissionGranted.invoke()
         }
     }
 }
@@ -170,8 +184,15 @@ private fun LocationPermissionContent(
 }
 
 private fun hasLocationPermissions(context: Context): Boolean {
-    return context.checkSelfPermission(COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-            context.checkSelfPermission(FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+    return hasPreciseLocationPermission(context) && hasApproximateLocationPermission(context)
+}
+
+private fun hasPreciseLocationPermission(context: Context): Boolean {
+    return context.checkSelfPermission(FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+}
+
+private fun hasApproximateLocationPermission(context: Context): Boolean {
+    return context.checkSelfPermission(COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
 }
 
 @Preview(showBackground = true)

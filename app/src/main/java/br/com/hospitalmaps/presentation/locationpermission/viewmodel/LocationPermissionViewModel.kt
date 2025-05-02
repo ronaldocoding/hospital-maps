@@ -1,38 +1,40 @@
 package br.com.hospitalmaps.presentation.locationpermission.viewmodel
 
 import androidx.lifecycle.ViewModel
+import br.com.hospitalmaps.presentation.locationpermission.action.LocationPermissionAction
 import br.com.hospitalmaps.presentation.locationpermission.state.LocationPermissionUiState
+import br.com.hospitalmaps.presentation.locationpermission.state.LocationPermissionUiState.Denied
+import br.com.hospitalmaps.presentation.locationpermission.state.LocationPermissionUiState.Granted
+import br.com.hospitalmaps.presentation.locationpermission.state.LocationPermissionUiState.Loading
+import br.com.hospitalmaps.presentation.locationpermission.state.LocationPermissionUiState.Paused
+import br.com.hospitalmaps.presentation.locationpermission.state.LocationPermissionUiState.RequestPermission
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 
 class LocationPermissionViewModel : ViewModel() {
-    private val _uiState = MutableStateFlow(LocationPermissionUiState())
+    private val _uiState = MutableStateFlow<LocationPermissionUiState>(Loading)
     val uiState = _uiState.asStateFlow()
 
-    fun onInit(isApproximateGranted: Boolean, isPreciseGranted: Boolean) {
-        _uiState.update {
-            it.copy(
-                isApproximateGranted = isApproximateGranted,
-                isPreciseGranted = isPreciseGranted
+    fun onAction(action: LocationPermissionAction) {
+        when (action) {
+            is LocationPermissionAction.OnInit -> handleOnInit(
+                action.isApproximateGranted,
+                action.isPreciseGranted
             )
+
+            LocationPermissionAction.OnPermissionsDenied -> _uiState.value = Denied
+
+            LocationPermissionAction.OnPause -> _uiState.value = Paused
+
+            LocationPermissionAction.OnPermissionsGranted -> _uiState.value = Granted
         }
     }
 
-    fun setPermissionsAsGranted() {
-        _uiState.update {
-            it.copy(
-                isApproximateGranted = true,
-                isPreciseGranted = true
-            )
-        }
-    }
-
-    fun setPermissionsAsDenied() {
-        _uiState.update {
-            it.copy(
-                areAllPermissionsDenied = true
-            )
+    private fun handleOnInit(isApproximateGranted: Boolean, isPreciseGranted: Boolean) {
+        if (isApproximateGranted && isPreciseGranted) {
+            _uiState.value = Granted
+        } else {
+            _uiState.value = RequestPermission
         }
     }
 }

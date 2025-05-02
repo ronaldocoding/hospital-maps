@@ -1,7 +1,9 @@
 package br.com.hospitalmaps.presentation.locationpermission.state
 
-data class LocationPermissionUiState(
-    val isApproximateGranted: Boolean = false,
-    val isPreciseGranted: Boolean = false,
-    val areAllPermissionsDenied: Boolean = false
-)
+sealed class LocationPermissionUiState {
+    data object Loading : LocationPermissionUiState()
+    data object RequestPermission : LocationPermissionUiState()
+    data object Denied : LocationPermissionUiState()
+    data object Granted : LocationPermissionUiState()
+    data object Paused : LocationPermissionUiState()
+}
