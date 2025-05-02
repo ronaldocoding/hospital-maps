@@ -16,6 +16,7 @@ playServicesLocation = "21.3.0"
 koinVersion = "4.1.0-Beta7"
 accompanist = "0.32.0"
 composeNavigationVersion = "2.8.9"
+kotlinSerialization = "2.0.21"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -48,3 +49,4 @@ accompanist-permissions = { module = "com.google.accompanist:accompanist-permiss
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinSerialization" }
