@@ -2,51 +2,52 @@ package br.com.hospitalmaps.presentation.home.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import br.com.hospitalmaps.data.repository.LocationRepository
-import br.com.hospitalmaps.domain.model.UserLocation
-import br.com.hospitalmaps.domain.usecase.GetNearestHospitalUseCase
+import br.com.hospitalmaps.data.repository.UserLocationRepository
+import br.com.hospitalmaps.data.model.UserLocationData
+import br.com.hospitalmaps.data.repository.HospitalRepository
+import br.com.hospitalmaps.presentation.home.action.HomeAction
+import br.com.hospitalmaps.presentation.home.state.HomeUiModel
 import br.com.hospitalmaps.presentation.home.state.HomeUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    private val getNearestHospitalUseCase: GetNearestHospitalUseCase,
-    private val locationRepository: LocationRepository
+    private val userLocationRepository: UserLocationRepository,
+    private val hospitalRepository: HospitalRepository
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(HomeUiState())
+    private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.LoadingUserData)
     val uiState = _uiState.asStateFlow()
 
-    fun getNearestHospital() {
-        viewModelScope.launch {
-            val nearestHospital = getNearestHospitalUseCase()
-            _uiState.update {
-                it.copy(
-                    nearestHospital = nearestHospital,
-                    isLoading = false
-                )
-            }
+    fun onAction(action: HomeAction) {
+        when (action) {
+            HomeAction.OnInit -> handleOnInit()
+            HomeAction.OnMapLoaded -> handleOnMapLoaded()
         }
     }
 
-    fun getUserLocation() {
+    private fun handleOnInit() {
         viewModelScope.launch {
-            val userLocation = locationRepository.getUserLastLocation().first()
-            _uiState.update {
-                it.copy(
-                    userLocation = UserLocation(
-                        latitude = userLocation.latitude,
-                        longitude = userLocation.longitude,
-                    ),
-                    isLoading = false
+            val userLocation = userLocationRepository.getUserLastLocation().first()
+            val userLocationData = UserLocationData(
+                userLocation.latitude,
+                userLocation.longitude
+            )
+            val nearbyHospitals = hospitalRepository.getNearbyHospitals(
+                userLocation
+            ).first()
+            _uiState.value = HomeUiState.LoadingMap(
+                HomeUiModel(
+                    userLocationData = userLocationData,
+                    nearbyHospitals = nearbyHospitals
                 )
-            }
+            )
         }
     }
 
-    fun onMapLoaded() {
-
+    private fun handleOnMapLoaded() {
+        val uiModel = (_uiState.value as? HomeUiState.LoadingMap)?.uiModel ?: return
+        _uiState.value = HomeUiState.Success(uiModel)
     }
 }

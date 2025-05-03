@@ -1,6 +1,6 @@
 package br.com.hospitalmaps.data.model
 
-data class UserLocation(
+data class UserLocationData(
     val latitude: Double,
     val longitude: Double
 )
