@@ -23,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -49,7 +50,7 @@ private const val FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION
 fun LocationPermissionScreen(onLocationPermissionGranted: () -> Unit) {
     val context = LocalContext.current
     val viewModel: LocationPermissionViewModel = koinViewModel()
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.onAction(
@@ -63,11 +64,11 @@ fun LocationPermissionScreen(onLocationPermissionGranted: () -> Unit) {
     LifecycleResumeEffect(Unit) {
         if (hasLocationPermissions(context)) {
             onLocationPermissionGranted.invoke()
-        } else if (uiState.value is LocationPermissionUiState.Paused) {
+        } else if (uiState is LocationPermissionUiState.Paused) {
             viewModel.onAction(LocationPermissionAction.OnPermissionsDenied)
         }
         onPauseOrDispose {
-            if (uiState.value is LocationPermissionUiState.Denied) {
+            if (uiState is LocationPermissionUiState.Denied) {
                 viewModel.onAction(LocationPermissionAction.OnPause)
             }
         }
@@ -91,7 +92,7 @@ fun LocationPermissionScreen(onLocationPermissionGranted: () -> Unit) {
     )
 
     Box(modifier = Modifier.safeContentPadding()) {
-        when (uiState.value) {
+        when (uiState) {
             is LocationPermissionUiState.Loading, LocationPermissionUiState.Paused -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),

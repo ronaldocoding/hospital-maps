@@ -11,7 +11,5 @@ data class HomeUiModel(
 sealed class HomeUiState {
     data object LoadingUserData : HomeUiState()
 
-    data class LoadingMap(val uiModel: HomeUiModel) : HomeUiState()
-
-    data class Success(val userDataUiModel: HomeUiModel) : HomeUiState()
+    data class Success(val uiModel: HomeUiModel) : HomeUiState()
 }
