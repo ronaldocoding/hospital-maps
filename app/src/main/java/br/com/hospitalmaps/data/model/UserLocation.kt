@@ -1,4 +1,4 @@
-package br.com.hospitalmaps.domain.model
+package br.com.hospitalmaps.data.model
 
 data class UserLocation(
     val latitude: Double,

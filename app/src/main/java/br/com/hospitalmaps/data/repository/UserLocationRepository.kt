@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
 
 @SuppressLint("MissingPermission")
-class LocationRepository(
+class UserLocationRepository(
     private val locationProviderClient: FusedLocationProviderClient,
     private val context: Context
 ) {

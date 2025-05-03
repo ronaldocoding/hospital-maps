@@ -1,8 +1,8 @@
-package br.com.hospitalmaps.domain.model
+package br.com.hospitalmaps.data.model
 
 data class HospitalData(
     val name: String,
     val latitude: Double,
     val longitude: Double,
-    val distanceFromUser: Float,
+    val distanceFromCenter: Float,
 )
