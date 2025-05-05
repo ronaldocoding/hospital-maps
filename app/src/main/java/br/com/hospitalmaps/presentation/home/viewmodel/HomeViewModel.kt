@@ -23,6 +23,7 @@ class HomeViewModel(
     fun onAction(action: HomeAction) {
         when (action) {
             HomeAction.OnInit -> handleOnInit()
+            HomeAction.OnMapLoaded -> handleOnMapLoaded()
         }
     }
 
@@ -42,6 +43,13 @@ class HomeViewModel(
                     nearbyHospitals = nearbyHospitals
                 )
             )
+        }
+    }
+
+    private fun handleOnMapLoaded() {
+        val currentUiModel = (_uiState.value as? HomeUiState.Success)?.uiModel
+        with(checkNotNull(currentUiModel)) {
+            _uiState.value = HomeUiState.Success(this@with.copy(isMapLoading = false))
         }
     }
 }

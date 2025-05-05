@@ -2,6 +2,7 @@ package br.com.hospitalmaps.presentation.home.view
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeContentPadding
@@ -12,6 +13,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -69,7 +71,8 @@ fun HomeScreen(onBackButtonClick: () -> Unit) {
                     modifier = Modifier
                         .fillMaxSize()
                         .safeContentPadding(),
-                    cameraPositionState = cameraPositionState
+                    cameraPositionState = cameraPositionState,
+                    onMapLoaded = { viewModel.onAction(HomeAction.OnMapLoaded) }
                 ) {
                     MarkerComposable(
                         state = userMarkerState,
@@ -90,6 +93,17 @@ fun HomeScreen(onBackButtonClick: () -> Unit) {
                             title = nearbyHospitals[index].name,
                             snippet = "Distância do usuário: ${nearbyHospitals[index].distanceFromCenter} KM",
                         )
+                    }
+                }
+                if ((uiState as HomeUiState.Success).uiModel.isMapLoading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .safeContentPadding()
+                            .background(Color.White),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
                     }
                 }
             }

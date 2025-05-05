@@ -5,7 +5,8 @@ import br.com.hospitalmaps.data.model.UserLocationData
 
 data class HomeUiModel(
     val userLocationData: UserLocationData,
-    val nearbyHospitals: List<HospitalData>
+    val nearbyHospitals: List<HospitalData>,
+    val isMapLoading: Boolean = true
 )
 
 sealed class HomeUiState {
