@@ -63,7 +63,7 @@ fun LocationPermissionScreen(onLocationPermissionGranted: () -> Unit) {
 
     LifecycleResumeEffect(Unit) {
         if (hasLocationPermissions(context)) {
-            onLocationPermissionGranted.invoke()
+            viewModel.onAction(LocationPermissionAction.OnPermissionsGranted)
         } else if (uiState is LocationPermissionUiState.Paused) {
             viewModel.onAction(LocationPermissionAction.OnPermissionsDenied)
         }
