@@ -5,8 +5,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,7 +44,7 @@ fun HomeScreen(onBackButtonClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .safeContentPadding(),
+            .systemBarsPadding(),
         contentAlignment = Alignment.Center
     ) {
         when (uiState) {
@@ -69,8 +69,7 @@ fun HomeScreen(onBackButtonClick: () -> Unit) {
                 }
                 GoogleMap(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .safeContentPadding(),
+                        .fillMaxSize(),
                     cameraPositionState = cameraPositionState,
                     onMapLoaded = { viewModel.onAction(HomeAction.OnMapLoaded) }
                 ) {
@@ -82,7 +81,7 @@ fun HomeScreen(onBackButtonClick: () -> Unit) {
                         Box {
                             Image(
                                 modifier = Modifier.size(24.dp),
-                                painter = painterResource(id = R.drawable.user_pin),
+                                painter = painterResource(id = R.drawable.image_user_pin),
                                 contentDescription = null
                             )
                         }
@@ -99,7 +98,6 @@ fun HomeScreen(onBackButtonClick: () -> Unit) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .safeContentPadding()
                             .background(Color.White),
                         contentAlignment = Alignment.Center
                     ) {
