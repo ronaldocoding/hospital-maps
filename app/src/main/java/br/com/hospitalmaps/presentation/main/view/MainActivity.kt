@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import br.com.hospitalmaps.presentation.locationpermission.view.LocationPermissionScreen
+import br.com.hospitalmaps.ui.theme.HospitalMapsAppTheme
 
 class MainActivity : ComponentActivity() {
 
@@ -12,7 +12,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContent {
-            MainScreen()
+            HospitalMapsAppTheme {
+                MainScreen()
+            }
         }
     }
 }

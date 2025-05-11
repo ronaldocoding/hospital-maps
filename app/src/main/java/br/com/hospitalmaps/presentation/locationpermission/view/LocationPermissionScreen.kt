@@ -8,16 +8,22 @@ import android.net.Uri
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -91,14 +97,25 @@ fun LocationPermissionScreen(onLocationPermissionGranted: () -> Unit) {
         }
     )
 
-    Box(modifier = Modifier.safeContentPadding()) {
+    Box(
+        modifier = Modifier.windowInsetsPadding(
+            WindowInsets.systemBars.only(
+                sides = WindowInsetsSides.Bottom
+            )
+        )
+    ) {
         when (uiState) {
             is LocationPermissionUiState.Loading, LocationPermissionUiState.Paused -> {
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.surface),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.primary,
+                        trackColor = MaterialTheme.colorScheme.onPrimary
+                    )
                 }
             }
 
@@ -146,6 +163,7 @@ private fun LocationPermissionContent(
 ) {
     Column(
         modifier = Modifier
+            .background(MaterialTheme.colorScheme.surface)
             .fillMaxSize()
             .padding(16.dp)
     ) {
@@ -161,12 +179,14 @@ private fun LocationPermissionContent(
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 Text(
+                    color = MaterialTheme.colorScheme.onSurface,
                     text = stringResource(title),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.titleLarge
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(horizontal = 4.dp),
                     text = stringResource(description),
                     textAlign = TextAlign.Center,
@@ -175,7 +195,14 @@ private fun LocationPermissionContent(
             }
         }
         Button(
+
             modifier = Modifier.fillMaxWidth(),
+            colors = ButtonColors(
+                contentColor = MaterialTheme.colorScheme.primary,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                disabledContentColor = MaterialTheme.colorScheme.onSecondary,
+                disabledContainerColor = MaterialTheme.colorScheme.onSecondaryContainer
+            ),
             onClick = onButtonClick,
             content = {
                 Text(text = stringResource(buttonLabel))
