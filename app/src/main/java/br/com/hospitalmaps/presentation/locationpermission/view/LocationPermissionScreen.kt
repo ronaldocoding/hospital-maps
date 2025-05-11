@@ -195,7 +195,6 @@ private fun LocationPermissionContent(
             }
         }
         Button(
-
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonColors(
                 contentColor = MaterialTheme.colorScheme.primary,
