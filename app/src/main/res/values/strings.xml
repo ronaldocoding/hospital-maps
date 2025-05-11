@@ -11,4 +11,8 @@
     <string name="precise_location_open_config_title">Precisamos acessar sua localização exata</string>
     <string name="precise_location_open_config_description">Sua localização exata é necessária para nós encontramos os hospitais mais próximos de você e exibirmos rotas para eles de forma precisa. Por favor, abra as configurações e permita a localização exata.</string>
     <string name="precise_location_open_config_button_label">Abrir configurações</string>
+
+    <!-- Home Screen -->
+    <string name="home_error_title">Ocorreu um erro inesperado</string>
+    <string name="home_error_button_label">Tentar novamente</string>
 </resources>

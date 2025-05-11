@@ -24,25 +24,30 @@ class HomeViewModel(
         when (action) {
             HomeAction.OnInit -> handleOnInit()
             HomeAction.OnMapLoaded -> handleOnMapLoaded()
+            HomeAction.TryAgain -> handleOnInit()
         }
     }
 
     private fun handleOnInit() {
         viewModelScope.launch {
-            val userLocation = userLocationRepository.getUserLastLocation().first()
-            val userLocationData = UserLocationData(
-                userLocation.latitude,
-                userLocation.longitude
-            )
-            val nearbyHospitals = hospitalRepository.getNearbyHospitals(
-                userLocation
-            ).first()
-            _uiState.value = HomeUiState.Success(
-                HomeUiModel(
-                    userLocationData = userLocationData,
-                    nearbyHospitals = nearbyHospitals
+            try {
+                val userLocation = userLocationRepository.getUserLastLocation().first()
+                val userLocationData = UserLocationData(
+                    userLocation.latitude,
+                    userLocation.longitude
                 )
-            )
+                val nearbyHospitals = hospitalRepository.getNearbyHospitals(
+                    userLocation
+                ).first()
+                _uiState.value = HomeUiState.Success(
+                    HomeUiModel(
+                        userLocationData = userLocationData,
+                        nearbyHospitals = nearbyHospitals
+                    )
+                )
+            } catch (_: Exception) {
+                _uiState.value = HomeUiState.Error
+            }
         }
     }
 

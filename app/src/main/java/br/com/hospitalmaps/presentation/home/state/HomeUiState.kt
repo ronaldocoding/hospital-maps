@@ -13,4 +13,6 @@ sealed class HomeUiState {
     data object LoadingUserData : HomeUiState()
 
     data class Success(val uiModel: HomeUiModel) : HomeUiState()
+
+    data object Error : HomeUiState()
 }
