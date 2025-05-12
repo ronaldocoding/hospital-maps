@@ -36,14 +36,25 @@ class HomeViewModel(
                     userLocation.latitude,
                     userLocation.longitude
                 )
-                val nearbyHospitals = hospitalRepository.getNearbyHospitals(
-                    userLocation
-                ).first()
                 _uiState.value = HomeUiState.Success(
                     HomeUiModel(
                         userLocationData = userLocationData,
-                        nearbyHospitals = nearbyHospitals
+                        nearbyHospitals = emptyList(),
                     )
+                )
+                hospitalRepository.getNearbyHospitals(
+                    centerLocation = userLocation,
+                    onSuccess = {
+                        _uiState.value = HomeUiState.Success(
+                            HomeUiModel(
+                                userLocationData = userLocationData,
+                                nearbyHospitals = it
+                            )
+                        )
+                    },
+                    onFailure = {
+                        _uiState.value = HomeUiState.Error
+                    }
                 )
             } catch (_: Exception) {
                 _uiState.value = HomeUiState.Error

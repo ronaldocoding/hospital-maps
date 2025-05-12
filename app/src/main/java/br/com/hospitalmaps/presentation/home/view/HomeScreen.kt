@@ -7,10 +7,15 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CircularProgressIndicator
@@ -59,8 +64,8 @@ fun HomeScreen(onBackButtonClick: () -> Unit) {
 
     Box(
         modifier = Modifier
-            .background(MaterialTheme.colorScheme.surface)
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface)
             .systemBarsPadding(),
         contentAlignment = Alignment.Center
     ) {
@@ -77,8 +82,14 @@ fun HomeScreen(onBackButtonClick: () -> Unit) {
             }
 
             is HomeUiState.Error -> {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = stringResource(R.string.home_error_title))
+                Column(
+                    modifier = Modifier.background(MaterialTheme.colorScheme.surface),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = stringResource(R.string.home_error_title),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(
                         onClick = { viewModel.onAction(HomeAction.TryAgain) },
@@ -109,8 +120,6 @@ private fun HomeContent(
     val hospitalPoints = nearbyHospitals.map {
         LatLng(it.latitude, it.longitude)
     }
-
-    val userMarkerState = rememberMarkerState(position = userPoint)
     val hospitalMarkerStates = hospitalPoints.map { point ->
         rememberMarkerState(position = point)
     }
@@ -124,30 +133,19 @@ private fun HomeContent(
                 mapStyleOptions = if (isDarkTheme) MapStyleOptions.loadRawResourceStyle(
                     context,
                     R.raw.map_style_dark
-                ) else null
+                ) else null,
+                isMyLocationEnabled = true
             )
         )
     }
     GoogleMap(
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .systemBarsPadding(),
         cameraPositionState = cameraPositionState,
         onMapLoaded = { viewModel.onAction(HomeAction.OnMapLoaded) },
         properties = mapProperties
     ) {
-        MarkerComposable(
-            state = userMarkerState,
-            title = "User Location",
-            snippet = "Marker in User Location",
-        ) {
-            Box {
-                Image(
-                    modifier = Modifier.size(24.dp),
-                    painter = painterResource(id = R.drawable.image_user_pin),
-                    contentDescription = null
-                )
-            }
-        }
         hospitalMarkerStates.forEachIndexed { index, markerState ->
             Marker(
                 state = markerState,
@@ -160,10 +158,13 @@ private fun HomeContent(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White),
+                .background(MaterialTheme.colorScheme.surface),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator()
+            CircularProgressIndicator(
+                color = MaterialTheme.colorScheme.primary,
+                trackColor = MaterialTheme.colorScheme.onPrimary
+            )
         }
     }
 }

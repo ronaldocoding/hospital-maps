@@ -19,7 +19,11 @@ private const val MAX_RESULT_COUNT = 10
 private const val LOCATION_PROVIDER = ""
 
 class HospitalRepository(private val placesClient: PlacesClient) {
-    fun getNearbyHospitals(centerLocation: Location): Flow<List<HospitalData>> = callbackFlow {
+    fun getNearbyHospitals(
+        centerLocation: Location,
+        onSuccess: (List<HospitalData>) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
         val placeFields = listOf(Place.Field.DISPLAY_NAME, Place.Field.LOCATION)
         val center = LatLng(centerLocation.latitude, centerLocation.longitude)
         val circle = CircularBounds.newInstance(center, RADIUS_SEARCH)
@@ -31,26 +35,22 @@ class HospitalRepository(private val placesClient: PlacesClient) {
             .build()
         val locationHelper = Location(LOCATION_PROVIDER)
         placesClient.searchNearby(searchNearbyHospitalsRequest)
-            .addOnSuccessListener {
-                runCatching {
-                    trySend(
-                        it.places.map {
-                            locationHelper.longitude = it?.location?.longitude ?: 0.0
-                            locationHelper.latitude = it?.location?.latitude ?: 0.0
-                            HospitalData(
-                                name = it?.displayName ?: "",
-                                longitude = locationHelper.longitude,
-                                latitude = locationHelper.latitude,
-                                distanceFromCenter = centerLocation.distanceTo(locationHelper)
-                            )
-                        }.sortedBy { it.distanceFromCenter }
+            .addOnSuccessListener { response ->
+                val data = response.places.map { hospital ->
+                    locationHelper.longitude = hospital?.location?.longitude ?: 0.0
+                    locationHelper.latitude = hospital?.location?.latitude ?: 0.0
+                    HospitalData(
+                        name = hospital?.displayName ?: "",
+                        longitude = locationHelper.longitude,
+                        latitude = locationHelper.latitude,
+                        distanceFromCenter = centerLocation.distanceTo(locationHelper)
                     )
-                }.onFailure { close(it) }
+                }.sortedBy { it.distanceFromCenter }
+                onSuccess(data)
             }
             .addOnFailureListener {
-                close(it)
+                onFailure(it)
             }
-        awaitClose()
-    }.flowOn(Dispatchers.IO)
+    }
 }
 
