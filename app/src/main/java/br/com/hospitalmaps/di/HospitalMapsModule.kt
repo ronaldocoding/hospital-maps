@@ -4,6 +4,7 @@ import br.com.hospitalmaps.data.repository.HospitalRepository
 import br.com.hospitalmaps.data.repository.UserLocationRepository
 import br.com.hospitalmaps.presentation.locationpermission.viewmodel.LocationPermissionViewModel
 import br.com.hospitalmaps.presentation.home.viewmodel.HomeViewModel
+import br.com.hospitalmaps.presentation.main.viewmodel.MainViewModel
 import com.google.android.gms.location.LocationServices
 import com.google.android.libraries.places.api.Places
 import org.koin.android.ext.koin.androidContext
@@ -18,4 +19,5 @@ val hospitalMapsModule = module {
     factoryOf(::HospitalRepository)
     viewModelOf(::HomeViewModel)
     viewModelOf(::LocationPermissionViewModel)
+    viewModelOf(::MainViewModel)
 }

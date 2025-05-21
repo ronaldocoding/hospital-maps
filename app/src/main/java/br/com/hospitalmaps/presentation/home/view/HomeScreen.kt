@@ -28,6 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -141,7 +142,8 @@ private fun HomeContent(
     GoogleMap(
         modifier = Modifier
             .fillMaxSize()
-            .systemBarsPadding(),
+            .systemBarsPadding()
+            .alpha(if (uiState.uiModel.isMapLoading) 0f else 1f),
         cameraPositionState = cameraPositionState,
         onMapLoaded = { viewModel.onAction(HomeAction.OnMapLoaded) },
         properties = mapProperties

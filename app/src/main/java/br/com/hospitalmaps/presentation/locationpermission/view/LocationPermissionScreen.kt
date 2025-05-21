@@ -210,7 +210,7 @@ private fun LocationPermissionContent(
     }
 }
 
-private fun hasLocationPermissions(context: Context): Boolean {
+fun hasLocationPermissions(context: Context): Boolean {
     return hasPreciseLocationPermission(context) && hasApproximateLocationPermission(context)
 }
 
