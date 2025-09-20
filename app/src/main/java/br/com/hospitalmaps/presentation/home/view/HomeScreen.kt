@@ -1,21 +1,17 @@
 package br.com.hospitalmaps.presentation.home.view
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CircularProgressIndicator
@@ -29,25 +25,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.com.hospitalmaps.R
+import br.com.hospitalmaps.data.model.UserLocationData
 import br.com.hospitalmaps.presentation.home.action.HomeAction
 import br.com.hospitalmaps.presentation.home.state.HomeUiState
 import br.com.hospitalmaps.presentation.home.viewmodel.HomeViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.maps.android.compose.DefaultMapProperties
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
-import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.MarkerComposable
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import org.koin.androidx.compose.koinViewModel
@@ -66,8 +59,7 @@ fun HomeScreen(onBackButtonClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface)
-            .systemBarsPadding(),
+            .background(MaterialTheme.colorScheme.surface),
         contentAlignment = Alignment.Center
     ) {
         when (uiState) {
@@ -139,21 +131,26 @@ private fun HomeContent(
             )
         )
     }
-    GoogleMap(
-        modifier = Modifier
-            .fillMaxSize()
-            .systemBarsPadding()
-            .alpha(if (uiState.uiModel.isMapLoading) 0f else 1f),
-        cameraPositionState = cameraPositionState,
-        onMapLoaded = { viewModel.onAction(HomeAction.OnMapLoaded) },
-        properties = mapProperties
-    ) {
-        hospitalMarkerStates.forEachIndexed { index, markerState ->
-            Marker(
-                state = markerState,
-                title = nearbyHospitals[index].name,
-                snippet = "Distância do usuário: ${nearbyHospitals[index].distanceFromCenter} KM",
-            )
+    if (nearbyHospitals.isEmpty().not() && userLocation.isEmpty().not()) {
+        GoogleMap(
+            modifier = Modifier
+                .fillMaxSize()
+                .alpha(if (uiState.uiModel.isMapLoading) 0f else 1f),
+            cameraPositionState = cameraPositionState,
+            onMapLoaded = { viewModel.onAction(HomeAction.OnMapLoaded) },
+            properties = mapProperties,
+            contentPadding = PaddingValues(top = statusBarHeightDp())
+        ) {
+            hospitalMarkerStates.forEachIndexed { index, markerState ->
+                Marker(
+                    state = markerState,
+                    title = nearbyHospitals[index].name,
+                    snippet = stringResource(
+                        R.string.distance_from_user,
+                        nearbyHospitals[index].distanceFromCenter
+                    ),
+                )
+            }
         }
     }
     if (uiState.uiModel.isMapLoading) {
@@ -169,4 +166,12 @@ private fun HomeContent(
             )
         }
     }
+}
+
+fun UserLocationData.isEmpty() = latitude == 0.0 && longitude == 0.0
+
+@Composable
+fun statusBarHeightDp(): Dp {
+    val insets = WindowInsets.statusBars.asPaddingValues()
+    return insets.calculateTopPadding()
 }
