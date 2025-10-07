@@ -17,16 +17,14 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        resConfigs("pt-br", "en")
         multiDexEnabled = true
+
+        androidResources {
+            localeFilters.add("pt-br")
+            localeFilters.add("en")
+        }
     }
 
-
-//    dexOptions {
-//        // This increases the amount of memory available to the dexer. This is required to build
-//        // apps using the Navigation SDK.
-//        javaMaxHeapSize = "4g"
-//    }
 
     buildTypes {
         release {
