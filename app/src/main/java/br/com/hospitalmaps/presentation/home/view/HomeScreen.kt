@@ -46,7 +46,7 @@ import com.google.maps.android.compose.rememberMarkerState
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun HomeScreen(onBackButtonClick: () -> Unit) {
+fun HomeScreen(onBackButtonClick: () -> Unit, onNavigate: (LatLng) -> Unit) {
     val viewModel: HomeViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -71,7 +71,7 @@ fun HomeScreen(onBackButtonClick: () -> Unit) {
             }
 
             is HomeUiState.Success -> {
-                HomeContent(uiState, viewModel)
+                HomeContent(uiState, viewModel, onNavigate)
             }
 
             is HomeUiState.Error -> {
@@ -104,7 +104,8 @@ fun HomeScreen(onBackButtonClick: () -> Unit) {
 @Composable
 private fun HomeContent(
     uiState: HomeUiState,
-    viewModel: HomeViewModel
+    viewModel: HomeViewModel,
+    onNavigate: (LatLng) -> Unit
 ) {
     val context = LocalContext.current
     val userLocation = (uiState as HomeUiState.Success).uiModel.userLocationData
@@ -149,6 +150,7 @@ private fun HomeContent(
                         R.string.distance_from_user,
                         nearbyHospitals[index].distanceFromCenter
                     ),
+                    onInfoWindowClick = { onNavigate(hospitalPoints[index]) }
                 )
             }
         }

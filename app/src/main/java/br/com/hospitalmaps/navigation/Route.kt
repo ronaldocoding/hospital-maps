@@ -8,4 +8,7 @@ object Route {
 
     @Serializable
     data object Home
+
+    @Serializable
+    data object Navigation
 }

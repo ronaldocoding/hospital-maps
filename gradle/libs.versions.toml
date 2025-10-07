@@ -23,6 +23,7 @@ playServicesMaps = "18.2.0"
 googleMapsNavigation = "7.0.0"
 androidxAnnotation = "1.7.0"
 coreLibraryDesugaring = "2.0.3"
+uiViewbinding = "1.9.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -56,6 +57,7 @@ play-services-maps = { group = "com.google.android.gms", name = "play-services-m
 google-maps-navigation = { group = "com.google.android.libraries.navigation", name = "navigation", version.ref = "googleMapsNavigation" }
 androidx-annotation = { group = "androidx.annotation", name = "annotation", version.ref = "androidxAnnotation" }
 core-library-desugaring = { group = "com.android.tools", name = "desugar_jdk_libs_nio", version.ref = "coreLibraryDesugaring" }
+androidx-ui-viewbinding = { group = "androidx.compose.ui", name = "ui-viewbinding", version.ref = "uiViewbinding" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

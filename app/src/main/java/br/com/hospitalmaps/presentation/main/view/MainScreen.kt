@@ -15,6 +15,7 @@ import br.com.hospitalmaps.presentation.home.view.HomeScreen
 import br.com.hospitalmaps.presentation.locationpermission.view.LocationPermissionScreen
 import br.com.hospitalmaps.presentation.locationpermission.view.hasLocationPermissions
 import br.com.hospitalmaps.presentation.main.viewmodel.MainViewModel
+import br.com.hospitalmaps.presentation.navigation.NavigationScreen
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -44,8 +45,15 @@ fun MainScreen() {
             HomeScreen(
                 onBackButtonClick = {
                     context.getActivity()?.finish()
+                },
+                onNavigate = { destinationLatLng ->
+                    navController.currentBackStackEntry?.savedStateHandle?.set("destinationLatLng", destinationLatLng)
+                    navController.navigate(Route.Navigation)
                 }
             )
+        }
+        composable<Route.Navigation> {
+            NavigationScreen(navController)
         }
     }
 }

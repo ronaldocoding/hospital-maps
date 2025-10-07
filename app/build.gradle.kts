@@ -20,7 +20,7 @@ android {
         multiDexEnabled = true
 
         androidResources {
-            localeFilters.add("pt-br")
+            localeFilters.add("pt")
             localeFilters.add("en")
         }
     }
@@ -46,6 +46,7 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+        viewBinding = true
     }
 }
 
@@ -71,6 +72,7 @@ dependencies {
     implementation(libs.google.maps.compose)
     implementation(libs.play.services.maps)
     implementation(libs.google.maps.navigation)
+    implementation(libs.androidx.ui.viewbinding)
 
     annotationProcessor(libs.androidx.annotation)
 
