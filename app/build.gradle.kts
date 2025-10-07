@@ -16,9 +16,17 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        resConfigs("pt-br", "en")
+        multiDexEnabled = true
     }
+
+
+//    dexOptions {
+//        // This increases the amount of memory available to the dexer. This is required to build
+//        // apps using the Navigation SDK.
+//        javaMaxHeapSize = "4g"
+//    }
 
     buildTypes {
         release {
@@ -32,6 +40,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
     }
     kotlinOptions {
         jvmTarget = "11"
@@ -65,6 +74,10 @@ dependencies {
     implementation(libs.play.services.maps)
     implementation(libs.google.maps.navigation)
 
+    annotationProcessor(libs.androidx.annotation)
+
+    coreLibraryDesugaring(libs.core.library.desugaring)
+
     testImplementation(libs.junit)
     testImplementation(libs.koin.test)
 
@@ -84,5 +97,4 @@ secrets {
         ignoreList.add("keyToIgnore")
         ignoreList.add("sdk.*")
     }
-
 }

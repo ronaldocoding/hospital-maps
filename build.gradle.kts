@@ -10,3 +10,9 @@ buildscript {
         classpath(libs.secrets.gradle.plugin)
     }
 }
+
+allprojects {
+    configurations.all {
+        exclude(group = "com.google.android.gms", module = "play-services-maps")
+    }
+}
