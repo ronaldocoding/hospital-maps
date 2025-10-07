@@ -43,7 +43,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -64,6 +63,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.google.maps.compose)
     implementation(libs.play.services.maps)
+    implementation(libs.google.maps.navigation)
 
     testImplementation(libs.junit)
     testImplementation(libs.koin.test)
