@@ -32,7 +32,10 @@ private const val TAG = "NavigationScreen"
 fun NavigationScreen(navController: NavController) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    val destinationLatLng = navController.currentBackStackEntry?.savedStateHandle?.get<LatLng>("destinationLatLng")
+    val destinationLatLngString = navController.previousBackStackEntry?.savedStateHandle?.get<String>("destinationLatLng")
+    val destinationLatLngValues = destinationLatLngString?.split(",")?.mapNotNull { it.toDoubleOrNull() }
+    val destinationLatLng = LatLng(destinationLatLngValues?.get(0) ?: 0.0, destinationLatLngValues?.get(1) ?: 0.0)
+    Log.d(TAG, "destinationLatLng: $destinationLatLng")
     val navigationFragment = remember { SupportNavigationFragment() }
     var navigator by remember { mutableStateOf<Navigator?>(null) }
 
@@ -47,6 +50,7 @@ fun NavigationScreen(navController: NavController) {
                                 googleMap.followMyLocation(GoogleMap.CameraPerspective.TILTED)
                             }
                             destinationLatLng?.let { latLng ->
+                                Log.d(TAG, "Calling startNavigation with latLng: $latLng")
                                 startNavigation(nav, navigationFragment, latLng)
                             }
                         }

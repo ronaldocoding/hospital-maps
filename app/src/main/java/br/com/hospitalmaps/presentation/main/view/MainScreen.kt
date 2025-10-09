@@ -2,6 +2,7 @@ package br.com.hospitalmaps.presentation.main.view
 
 import android.content.Context
 import android.content.ContextWrapper
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -47,7 +48,9 @@ fun MainScreen() {
                     context.getActivity()?.finish()
                 },
                 onNavigate = { destinationLatLng ->
-                    navController.currentBackStackEntry?.savedStateHandle?.set("destinationLatLng", destinationLatLng)
+                    val destinationLatLngToString = "${destinationLatLng.latitude},${destinationLatLng.longitude}"
+                    Log.d("MainScreen", "Navigating to: $destinationLatLng")
+                    navController.currentBackStackEntry?.savedStateHandle?.set("destinationLatLng", destinationLatLngToString)
                     navController.navigate(Route.Navigation)
                 }
             )

@@ -1,5 +1,6 @@
 package br.com.hospitalmaps.presentation.home.view
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -150,7 +151,11 @@ private fun HomeContent(
                         R.string.distance_from_user,
                         nearbyHospitals[index].distanceFromCenter
                     ),
-                    onInfoWindowClick = { onNavigate(hospitalPoints[index]) }
+                    onInfoWindowClick = {
+                        Log.d("HomeScreen", "Hospital selected: ${nearbyHospitals[index].name}, navigating to details...")
+                        Log.d("HomeScreen", "Hospital coordinates: ${hospitalPoints[index]}")
+                        onNavigate(hospitalPoints[index])
+                    }
                 )
             }
         }
