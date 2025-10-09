@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -141,7 +142,7 @@ private fun HomeContent(
             cameraPositionState = cameraPositionState,
             onMapLoaded = { viewModel.onAction(HomeAction.OnMapLoaded) },
             properties = mapProperties,
-            contentPadding = PaddingValues(top = statusBarHeightDp())
+            contentPadding = PaddingValues(top = statusBarHeightDp(), bottom = bottomBarHeightDp())
         ) {
             hospitalMarkerStates.forEachIndexed { index, markerState ->
                 Marker(
@@ -181,4 +182,10 @@ fun UserLocationData.isEmpty() = latitude == 0.0 && longitude == 0.0
 fun statusBarHeightDp(): Dp {
     val insets = WindowInsets.statusBars.asPaddingValues()
     return insets.calculateTopPadding()
+}
+
+@Composable
+fun bottomBarHeightDp(): Dp {
+    val insets = WindowInsets.navigationBars.asPaddingValues()
+    return insets.calculateBottomPadding()
 }

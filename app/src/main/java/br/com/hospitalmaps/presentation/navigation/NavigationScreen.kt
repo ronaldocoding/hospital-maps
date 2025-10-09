@@ -2,12 +2,14 @@ package br.com.hospitalmaps.presentation.navigation
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.fragment.app.FragmentActivity
@@ -19,6 +21,7 @@ import br.com.hospitalmaps.R
 import br.com.hospitalmaps.databinding.NavigationFragmentLayoutBinding
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.libraries.navigation.NavigationApi
 import com.google.android.libraries.navigation.Navigator
 import com.google.android.libraries.navigation.RoutingOptions
@@ -32,24 +35,33 @@ private const val TAG = "NavigationScreen"
 fun NavigationScreen(navController: NavController) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    val destinationLatLngString = navController.previousBackStackEntry?.savedStateHandle?.get<String>("destinationLatLng")
-    val destinationLatLngValues = destinationLatLngString?.split(",")?.mapNotNull { it.toDoubleOrNull() }
-    val destinationLatLng = LatLng(destinationLatLngValues?.get(0) ?: 0.0, destinationLatLngValues?.get(1) ?: 0.0)
+    val destinationLatLngString =
+        navController.previousBackStackEntry?.savedStateHandle?.get<String>("destinationLatLng")
+    val destinationLatLngValues =
+        destinationLatLngString?.split(",")?.mapNotNull { it.toDoubleOrNull() }
+    val destinationLatLng =
+        LatLng(destinationLatLngValues?.get(0) ?: 0.0, destinationLatLngValues?.get(1) ?: 0.0)
     Log.d(TAG, "destinationLatLng: $destinationLatLng")
     val navigationFragment = remember { SupportNavigationFragment() }
-    var navigator by remember { mutableStateOf<Navigator?>(null) }
+    val isDarkMode = isSystemInDarkTheme()
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                NavigationApi.getNavigator(context as FragmentActivity,
+                NavigationApi.getNavigator(
+                    context as FragmentActivity,
                     object : NavigationApi.NavigatorListener {
                         override fun onNavigatorReady(nav: Navigator) {
-                            navigator = nav
                             navigationFragment.getMapAsync { googleMap ->
+                                googleMap.setMapStyle(
+                                    MapStyleOptions.loadRawResourceStyle(
+                                        context,
+                                        if (isDarkMode) R.raw.map_style_dark else R.raw.map_style_standard
+                                    )
+                                )
                                 googleMap.followMyLocation(GoogleMap.CameraPerspective.TILTED)
                             }
-                            destinationLatLng?.let { latLng ->
+                            destinationLatLng.let { latLng ->
                                 Log.d(TAG, "Calling startNavigation with latLng: $latLng")
                                 startNavigation(nav, navigationFragment, latLng)
                             }
@@ -64,11 +76,14 @@ fun NavigationScreen(navController: NavController) {
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
-            navigator = null
         }
     }
 
-    AndroidViewBinding(NavigationFragmentLayoutBinding::inflate) {
+
+    AndroidViewBinding(
+        NavigationFragmentLayoutBinding::inflate,
+        modifier = Modifier.safeContentPadding()
+    ) {
         val fragmentManager = (context as FragmentActivity).supportFragmentManager
         fragmentManager.beginTransaction()
             .replace(R.id.navigation_fragment, navigationFragment)
@@ -99,15 +114,19 @@ private fun startNavigation(
                         googleMap.isMyLocationEnabled = true
                     }
                 }
+
                 Navigator.RouteStatus.NO_ROUTE_FOUND -> {
                     Log.e(TAG, "No route found")
                 }
+
                 Navigator.RouteStatus.NETWORK_ERROR -> {
                     Log.e(TAG, "Network error")
                 }
+
                 Navigator.RouteStatus.ROUTE_CANCELED -> {
                     Log.e(TAG, "Route canceled")
                 }
+
                 else -> {
                     Log.e(TAG, "Unexpected route status: $routeStatus")
                 }
