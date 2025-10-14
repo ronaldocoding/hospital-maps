@@ -20,7 +20,7 @@ android {
         multiDexEnabled = true
 
         androidResources {
-            localeFilters.add("pt")
+            localeFilters.add("pt-rBR")
             localeFilters.add("en")
         }
     }

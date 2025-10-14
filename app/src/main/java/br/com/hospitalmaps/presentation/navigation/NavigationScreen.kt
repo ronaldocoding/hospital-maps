@@ -3,6 +3,7 @@ package br.com.hospitalmaps.presentation.navigation
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -17,6 +18,8 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import br.com.hospitalmaps.R
 import br.com.hospitalmaps.databinding.NavigationFragmentLayoutBinding
+import br.com.hospitalmaps.shared.bottomBarHeightDp
+import br.com.hospitalmaps.shared.statusBarHeightDp
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
@@ -80,7 +83,7 @@ fun NavigationScreen(navController: NavController) {
 
     AndroidViewBinding(
         NavigationFragmentLayoutBinding::inflate,
-        modifier = Modifier.safeContentPadding()
+        modifier = Modifier.padding(top = statusBarHeightDp(), bottom = bottomBarHeightDp())
     ) {
         val fragmentManager = (context as FragmentActivity).supportFragmentManager
         fragmentManager.beginTransaction()

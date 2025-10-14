@@ -37,6 +37,8 @@ import br.com.hospitalmaps.data.model.UserLocationData
 import br.com.hospitalmaps.presentation.home.action.HomeAction
 import br.com.hospitalmaps.presentation.home.state.HomeUiState
 import br.com.hospitalmaps.presentation.home.viewmodel.HomeViewModel
+import br.com.hospitalmaps.shared.bottomBarHeightDp
+import br.com.hospitalmaps.shared.statusBarHeightDp
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
@@ -177,15 +179,3 @@ private fun HomeContent(
 }
 
 fun UserLocationData.isEmpty() = latitude == 0.0 && longitude == 0.0
-
-@Composable
-fun statusBarHeightDp(): Dp {
-    val insets = WindowInsets.statusBars.asPaddingValues()
-    return insets.calculateTopPadding()
-}
-
-@Composable
-fun bottomBarHeightDp(): Dp {
-    val insets = WindowInsets.navigationBars.asPaddingValues()
-    return insets.calculateBottomPadding()
-}
