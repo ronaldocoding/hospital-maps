@@ -2,9 +2,12 @@ package br.com.hospitalmaps.presentation.navigation
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
@@ -81,14 +84,20 @@ fun NavigationScreen(navController: NavController) {
     }
 
 
-    AndroidViewBinding(
-        NavigationFragmentLayoutBinding::inflate,
-        modifier = Modifier.padding(top = statusBarHeightDp(), bottom = bottomBarHeightDp())
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface)
     ) {
-        val fragmentManager = (context as FragmentActivity).supportFragmentManager
-        fragmentManager.beginTransaction()
-            .replace(R.id.navigation_fragment, navigationFragment)
-            .commitNow()
+        AndroidViewBinding(
+            NavigationFragmentLayoutBinding::inflate,
+            modifier = Modifier.padding(top = statusBarHeightDp(), bottom = bottomBarHeightDp())
+        ) {
+            val fragmentManager = (context as FragmentActivity).supportFragmentManager
+            fragmentManager.beginTransaction()
+                .replace(R.id.navigation_fragment, navigationFragment)
+                .commitNow()
+        }
     }
 }
 
