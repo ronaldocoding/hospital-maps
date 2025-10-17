@@ -8,12 +8,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CircularProgressIndicator
@@ -29,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.com.hospitalmaps.R
@@ -44,6 +39,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
@@ -136,6 +132,13 @@ private fun HomeContent(
             )
         )
     }
+    val uiSettings by remember {
+        mutableStateOf(
+            MapUiSettings(
+                zoomControlsEnabled = false
+            )
+        )
+    }
     if (nearbyHospitals.isEmpty().not() && userLocation.isEmpty().not()) {
         GoogleMap(
             modifier = Modifier
@@ -144,7 +147,8 @@ private fun HomeContent(
             cameraPositionState = cameraPositionState,
             onMapLoaded = { viewModel.onAction(HomeAction.OnMapLoaded) },
             properties = mapProperties,
-            contentPadding = PaddingValues(top = statusBarHeightDp(), bottom = bottomBarHeightDp())
+            contentPadding = PaddingValues(top = statusBarHeightDp(), bottom = bottomBarHeightDp()),
+            uiSettings = uiSettings
         ) {
             hospitalMarkerStates.forEachIndexed { index, markerState ->
                 Marker(
