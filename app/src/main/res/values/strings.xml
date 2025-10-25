@@ -16,4 +16,5 @@
     <string name="home_error_title">Ocorreu um erro inesperado</string>
     <string name="home_error_button_label">Tentar novamente</string>
     <string name="distance_from_user">Distância: %s km</string>
+    <string name="navigate_to_hospital">Navegar</string>
 </resources>

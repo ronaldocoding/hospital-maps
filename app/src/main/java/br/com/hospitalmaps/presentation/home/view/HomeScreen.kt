@@ -4,22 +4,30 @@ import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,14 +35,19 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.com.hospitalmaps.R
 import br.com.hospitalmaps.data.model.UserLocationData
@@ -50,6 +63,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerInfoWindow
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import org.koin.androidx.compose.koinViewModel
@@ -129,6 +143,10 @@ private fun HomeContent(
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(userPoint, 10f)
     }
+
+    // State for selected marker
+    var selectedMarkerIndex by remember { mutableStateOf<Int?>(null) }
+
     val isDarkTheme = isSystemInDarkTheme()
     val mapProperties by remember {
         mutableStateOf(
@@ -149,6 +167,7 @@ private fun HomeContent(
             )
         )
     }
+
     if (nearbyHospitals.isEmpty().not() && userLocation.isEmpty().not()) {
         Scaffold(
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
@@ -186,6 +205,7 @@ private fun HomeContent(
                     .padding(innerPadding),
                 cameraPositionState = cameraPositionState,
                 onMapLoaded = { viewModel.onAction(HomeAction.OnMapLoaded) },
+                onMapClick = { selectedMarkerIndex = null }, // Close info window when map is clicked
                 properties = mapProperties,
                 contentPadding = PaddingValues(
                     top = statusBarHeightDp(),
@@ -194,22 +214,43 @@ private fun HomeContent(
                 uiSettings = uiSettings
             ) {
                 hospitalMarkerStates.forEachIndexed { index, markerState ->
-                    Marker(
-                        state = markerState,
-                        title = nearbyHospitals[index].name,
-                        snippet = stringResource(
-                            R.string.distance_from_user,
-                            nearbyHospitals[index].distanceFromCenter
-                        ),
-                        onInfoWindowClick = {
-                            Log.d(
-                                "HomeScreen",
-                                "Hospital selected: ${nearbyHospitals[index].name}, navigating to details..."
+                    if (selectedMarkerIndex == index) {
+                        // Show MarkerInfoWindow with custom content for selected marker
+                        MarkerInfoWindow(
+                            state = markerState,
+                            onInfoWindowClick = {
+                                Log.d(
+                                    "HomeScreen",
+                                    "Hospital selected: ${nearbyHospitals[index].name}, navigating to details..."
+                                )
+                                Log.d("HomeScreen", "Hospital coordinates: ${hospitalPoints[index]}")
+                                onNavigate(hospitalPoints[index])
+                            }
+                        ) { _ ->
+                            HospitalInfoCard(
+                                hospitalName = nearbyHospitals[index].name,
+                                distance = stringResource(
+                                    R.string.distance_from_user,
+                                    nearbyHospitals[index].distanceFromCenter
+                                ),
+                                onNavigateClick = {
+                                    onNavigate(hospitalPoints[index])
+                                },
+                                onDismiss = {
+                                    selectedMarkerIndex = null
+                                }
                             )
-                            Log.d("HomeScreen", "Hospital coordinates: ${hospitalPoints[index]}")
-                            onNavigate(hospitalPoints[index])
                         }
-                    )
+                    } else {
+                        // Show regular marker for non-selected markers
+                        Marker(
+                            state = markerState,
+                            onClick = {
+                                selectedMarkerIndex = index
+                                true // Return true to consume the click
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -225,6 +266,85 @@ private fun HomeContent(
                 color = MaterialTheme.colorScheme.primary,
                 trackColor = MaterialTheme.colorScheme.onPrimary
             )
+        }
+    }
+}
+
+@Composable
+private fun HospitalInfoCard(
+    hospitalName: String,
+    distance: String,
+    onNavigateClick: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .width(280.dp)
+            .wrapContentHeight()
+            .shadow(8.dp, RoundedCornerShape(16.dp)),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            // Hospital Name
+            Text(
+                text = hospitalName,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                ),
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            // Distance
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_location_on), // You may need to add this icon or use another
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(16.dp)
+                )
+                Text(
+                    text = distance,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            // Navigate Button
+            OutlinedButton(
+                onClick = {
+                    onNavigateClick()
+                    onDismiss()
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_navigation), // You may need to add this icon or use another
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.navigate_to_hospital), // Add this string resource
+                    fontWeight = FontWeight.Medium
+                )
+            }
         }
     }
 }
