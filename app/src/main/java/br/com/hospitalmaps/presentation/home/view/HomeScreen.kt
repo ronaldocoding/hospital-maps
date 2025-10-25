@@ -75,7 +75,7 @@ import com.google.maps.android.compose.rememberMarkerState
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun HomeScreen(onBackButtonClick: () -> Unit, onNavigate: (LatLng) -> Unit) {
+fun HomeScreen(onBackButtonClick: () -> Unit, onNavigate: (placeId: String) -> Unit) {
     val viewModel: HomeViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -134,7 +134,7 @@ fun HomeScreen(onBackButtonClick: () -> Unit, onNavigate: (LatLng) -> Unit) {
 private fun HomeContent(
     uiState: HomeUiState,
     viewModel: HomeViewModel,
-    onNavigate: (LatLng) -> Unit
+    onNavigate: (placeId: String) -> Unit
 ) {
     val context = LocalContext.current
     val userLocation = (uiState as HomeUiState.Success).uiModel.userLocationData
@@ -213,7 +213,7 @@ private fun HomeContent(
                                     shape = RoundedCornerShape(12.dp)
                                 ),
                             onClick = {
-                                onNavigate(hospitalPoints[0])
+                                onNavigate(nearbyHospitals[0].placeId)
                             }
                         ) {
                             Icon(
@@ -258,7 +258,7 @@ private fun HomeContent(
                                         "HomeScreen",
                                         "Hospital coordinates: ${hospitalPoints[index]}"
                                     )
-                                    onNavigate(hospitalPoints[index])
+                                    onNavigate(nearbyHospitals[index].placeId)
                                 }
                             ) { _ ->
                                 HospitalInfoCard(
@@ -268,7 +268,7 @@ private fun HomeContent(
                                         nearbyHospitals[index].distanceFromCenter
                                     ),
                                     onNavigateClick = {
-                                        onNavigate(hospitalPoints[index])
+                                        onNavigate(nearbyHospitals[index].placeId)
                                     },
                                     onDismiss = {
                                         selectedMarkerIndex = null

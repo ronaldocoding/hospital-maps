@@ -47,10 +47,9 @@ fun MainScreen() {
                 onBackButtonClick = {
                     context.getActivity()?.finish()
                 },
-                onNavigate = { destinationLatLng ->
-                    val destinationLatLngToString = "${destinationLatLng.latitude},${destinationLatLng.longitude}"
-                    Log.d("MainScreen", "Navigating to: $destinationLatLng")
-                    navController.currentBackStackEntry?.savedStateHandle?.set("destinationLatLng", destinationLatLngToString)
+                onNavigate = { placeId ->
+                    Log.d("MainScreen", "Navigating to place ID: $placeId")
+                    navController.currentBackStackEntry?.savedStateHandle?.set("destinationPlaceId", placeId)
                     navController.navigate(Route.Navigation)
                 }
             )

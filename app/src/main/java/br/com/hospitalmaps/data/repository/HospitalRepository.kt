@@ -7,11 +7,6 @@ import com.google.android.libraries.places.api.model.CircularBounds
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.android.libraries.places.api.net.SearchNearbyRequest
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.flowOn
 
 private const val RADIUS_SEARCH = 10000.0
 private const val HOSPITAL_TYPE = "hospital"
@@ -24,7 +19,11 @@ class HospitalRepository(private val placesClient: PlacesClient) {
         onSuccess: (List<HospitalData>) -> Unit,
         onFailure: (Exception) -> Unit
     ) {
-        val placeFields = listOf(Place.Field.DISPLAY_NAME, Place.Field.LOCATION)
+        val placeFields = listOf(
+            Place.Field.DISPLAY_NAME,
+            Place.Field.LOCATION,
+            Place.Field.ID
+        )
         val center = LatLng(centerLocation.latitude, centerLocation.longitude)
         val circle = CircularBounds.newInstance(center, RADIUS_SEARCH)
         val includedTypes = listOf(HOSPITAL_TYPE)
@@ -43,7 +42,8 @@ class HospitalRepository(private val placesClient: PlacesClient) {
                         name = hospital?.displayName ?: "",
                         longitude = locationHelper.longitude,
                         latitude = locationHelper.latitude,
-                        distanceFromCenter = centerLocation.distanceTo(locationHelper)
+                        distanceFromCenter = centerLocation.distanceTo(locationHelper),
+                        placeId = hospital?.id ?: ""
                     )
                 }.sortedBy { it.distanceFromCenter }
                 onSuccess(data)

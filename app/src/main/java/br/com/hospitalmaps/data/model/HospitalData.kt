@@ -5,4 +5,5 @@ data class HospitalData(
     val latitude: Double,
     val longitude: Double,
     val distanceFromCenter: Float,
+    val placeId: String
 )

@@ -24,7 +24,6 @@ import br.com.hospitalmaps.databinding.NavigationFragmentLayoutBinding
 import br.com.hospitalmaps.shared.bottomBarHeightDp
 import br.com.hospitalmaps.shared.statusBarHeightDp
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.libraries.navigation.NavigationApi
 import com.google.android.libraries.navigation.Navigator
@@ -39,13 +38,10 @@ private const val TAG = "NavigationScreen"
 fun NavigationScreen(navController: NavController) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    val destinationLatLngString =
-        navController.previousBackStackEntry?.savedStateHandle?.get<String>("destinationLatLng")
-    val destinationLatLngValues =
-        destinationLatLngString?.split(",")?.mapNotNull { it.toDoubleOrNull() }
-    val destinationLatLng =
-        LatLng(destinationLatLngValues?.get(0) ?: 0.0, destinationLatLngValues?.get(1) ?: 0.0)
-    Log.d(TAG, "destinationLatLng: $destinationLatLng")
+    val destinationPlaceId = navController.previousBackStackEntry?.savedStateHandle?.get<String>(
+        "destinationPlaceId"
+    )
+    Log.d(TAG, "destinationPlaceId: $destinationPlaceId")
     val navigationFragment = remember { SupportNavigationFragment() }
     val isDarkMode = isSystemInDarkTheme()
 
@@ -65,9 +61,9 @@ fun NavigationScreen(navController: NavController) {
                                 )
                                 googleMap.followMyLocation(GoogleMap.CameraPerspective.TILTED)
                             }
-                            destinationLatLng.let { latLng ->
-                                Log.d(TAG, "Calling startNavigation with latLng: $latLng")
-                                startNavigation(nav, navigationFragment, latLng)
+                            destinationPlaceId?.let { placeId ->
+                                Log.d(TAG, "Calling startNavigation with placeId: $placeId")
+                                startNavigation(nav, navigationFragment, placeId)
                             }
                         }
 
@@ -105,10 +101,10 @@ fun NavigationScreen(navController: NavController) {
 private fun startNavigation(
     navigator: Navigator,
     navFragment: SupportNavigationFragment,
-    destination: LatLng
+    destinationPlaceId: String
 ) {
     val destinationWaypoint = Waypoint.builder()
-        .setLatLng(destination.latitude, destination.longitude)
+        .setPlaceIdString(destinationPlaceId)
         .build()
 
     val routingOptions = RoutingOptions()
