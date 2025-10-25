@@ -1,5 +1,6 @@
 package br.com.hospitalmaps.presentation.home.view
 
+import android.app.Activity
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -169,8 +170,12 @@ private fun HomeContent(
     }
 
     when {
-        nearbyHospitals.isEmpty() -> {
-            // TODO: Show empty state
+        true -> {
+            EmptyHospitalsState(
+                onCloseApp = {
+                    (context as? Activity)?.finish()
+                }
+            )
         }
 
         userLocation.isEmpty() -> {
@@ -268,23 +273,23 @@ private fun HomeContent(
                     }
                 }
             }
-        }
-    }
 
-    if (uiState.uiModel.isMapLoading
-        && userLocation.isEmpty().not()
-        && nearbyHospitals.isNotEmpty()
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surface),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator(
-                color = MaterialTheme.colorScheme.primary,
-                trackColor = MaterialTheme.colorScheme.onPrimary
-            )
+            if (uiState.uiModel.isMapLoading
+                && userLocation.isEmpty().not()
+                && nearbyHospitals.isNotEmpty()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.surface),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.primary,
+                        trackColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+            }
         }
     }
 }
@@ -364,6 +369,93 @@ private fun HospitalInfoCard(
                     fontWeight = FontWeight.Medium
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun EmptyHospitalsState(onCloseApp: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        // Hospital icon
+        Icon(
+            painter = painterResource(id = R.drawable.image_hospital_maps),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(72.dp)
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Title
+        Text(
+            text = stringResource(R.string.no_hospitals_title),
+            style = MaterialTheme.typography.headlineSmall.copy(
+                fontWeight = FontWeight.Bold
+            ),
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Description
+        Text(
+            text = stringResource(R.string.no_hospitals_description),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Suggestions card
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            ),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.no_hospitals_suggestions),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                modifier = Modifier.padding(16.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // Close app button
+        Button(
+            onClick = onCloseApp,
+            colors = ButtonColors(
+                contentColor = MaterialTheme.colorScheme.onError,
+                containerColor = MaterialTheme.colorScheme.error,
+                disabledContentColor = MaterialTheme.colorScheme.onSecondary,
+                disabledContainerColor = MaterialTheme.colorScheme.onSecondaryContainer
+            ),
+            shape = RoundedCornerShape(8.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_close),
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = stringResource(R.string.close_app_button),
+                fontWeight = FontWeight.Medium
+            )
         }
     }
 }

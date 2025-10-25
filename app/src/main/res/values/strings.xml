@@ -17,4 +17,8 @@
     <string name="home_error_button_label">Tentar novamente</string>
     <string name="distance_from_user">Distância: %s km</string>
     <string name="navigate_to_hospital">Navegar</string>
+    <string name="no_hospitals_title">Nenhum hospital encontrado</string>
+    <string name="no_hospitals_description">Não foi possível encontrar hospitais próximos à sua localização atual. Isso pode acontecer em áreas rurais ou remotas.</string>
+    <string name="no_hospitals_suggestions">Sugestões:\n• Verifique sua conexão com a internet\n• Tente se aproximar de uma área urbana\n• Contate os serviços de emergência: 192 (SAMU) ou 193 (Bombeiros)</string>
+    <string name="close_app_button">Fechar aplicativo</string>
 </resources>
