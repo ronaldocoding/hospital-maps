@@ -139,6 +139,7 @@ private fun HomeContent(
     val context = LocalContext.current
     val userLocation = (uiState as HomeUiState.Success).uiModel.userLocationData
     val nearbyHospitals = uiState.uiModel.nearbyHospitals
+    val isMapLoading = uiState.uiModel.isMapLoading
     val userPoint = LatLng(userLocation.latitude, userLocation.longitude)
     val hospitalPoints = nearbyHospitals.map {
         LatLng(it.latitude, it.longitude)
@@ -174,14 +175,6 @@ private fun HomeContent(
     }
 
     when {
-        nearbyHospitals.isEmpty() -> {
-            EmptyHospitalsState(
-                onCloseApp = {
-                    (context as? Activity)?.finish()
-                }
-            )
-        }
-
         userLocation.isEmpty() -> {
             EmptyLocationState(
                 onRetryLocation = {
@@ -191,6 +184,14 @@ private fun HomeContent(
                     val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
                     context.startActivity(intent)
                 },
+                onCloseApp = {
+                    (context as? Activity)?.finish()
+                }
+            )
+        }
+
+        nearbyHospitals.isEmpty() && !isMapLoading -> {
+            EmptyHospitalsState(
                 onCloseApp = {
                     (context as? Activity)?.finish()
                 }
@@ -287,10 +288,7 @@ private fun HomeContent(
                 }
             }
 
-            if (uiState.uiModel.isMapLoading
-                && userLocation.isEmpty().not()
-                && nearbyHospitals.isNotEmpty()
-            ) {
+            if (isMapLoading || (nearbyHospitals.isEmpty() && userLocation.isEmpty().not())) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -360,7 +358,6 @@ private fun HospitalInfoCard(
                 )
             }
 
-            // Navigate Button
             OutlinedButton(
                 onClick = {
                     onNavigateClick()
