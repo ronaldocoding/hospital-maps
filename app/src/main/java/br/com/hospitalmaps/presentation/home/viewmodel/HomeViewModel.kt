@@ -36,12 +36,6 @@ class HomeViewModel(
                     userLocation.latitude,
                     userLocation.longitude
                 )
-                _uiState.value = HomeUiState.Success(
-                    HomeUiModel(
-                        userLocationData = userLocationData,
-                        nearbyHospitals = emptyList(),
-                    )
-                )
                 hospitalRepository.getNearbyHospitals(
                     centerLocation = userLocation,
                     onSuccess = {
