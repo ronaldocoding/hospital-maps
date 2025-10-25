@@ -21,4 +21,9 @@
     <string name="no_hospitals_description">Não foi possível encontrar hospitais próximos à sua localização atual. Isso pode acontecer em áreas rurais ou remotas.</string>
     <string name="no_hospitals_suggestions">Sugestões:\n• Verifique sua conexão com a internet\n• Tente se aproximar de uma área urbana\n• Contate os serviços de emergência: 192 (SAMU) ou 193 (Bombeiros)</string>
     <string name="close_app_button">Fechar aplicativo</string>
+    <string name="no_location_title">Localização não disponível</string>
+    <string name="no_location_description">Não foi possível obter sua localização atual. Para encontrar hospitais próximos, precisamos acessar sua localização.</string>
+    <string name="no_location_suggestions">Para resolver este problema:\n• Verifique se a localização está ativada no seu dispositivo\n• Certifique-se de que o app tem permissão para acessar sua localização\n• Tente sair e voltar para uma área com melhor sinal GPS</string>
+    <string name="retry_location_button">Tentar novamente</string>
+    <string name="open_settings_button">Abrir configurações</string>
 </resources>

@@ -1,6 +1,8 @@
 package br.com.hospitalmaps.presentation.home.view
 
 import android.app.Activity
+import android.content.Intent
+import android.provider.Settings
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -20,6 +22,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
@@ -170,7 +175,7 @@ private fun HomeContent(
     }
 
     when {
-        true -> {
+        nearbyHospitals.isEmpty() -> {
             EmptyHospitalsState(
                 onCloseApp = {
                     (context as? Activity)?.finish()
@@ -179,7 +184,18 @@ private fun HomeContent(
         }
 
         userLocation.isEmpty() -> {
-            // TODO: Show no location state
+            EmptyLocationState(
+                onRetryLocation = {
+                    viewModel.onAction(HomeAction.OnInit) // Retry getting location
+                },
+                onOpenSettings = {
+                    val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                    context.startActivity(intent)
+                },
+                onCloseApp = {
+                    (context as? Activity)?.finish()
+                }
+            )
         }
 
         else -> {
@@ -456,6 +472,139 @@ private fun EmptyHospitalsState(onCloseApp: () -> Unit) {
                 text = stringResource(R.string.close_app_button),
                 fontWeight = FontWeight.Medium
             )
+        }
+    }
+}
+
+@Composable
+private fun EmptyLocationState(
+    onRetryLocation: () -> Unit,
+    onOpenSettings: () -> Unit,
+    onCloseApp: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        // Location icon
+        Icon(
+            painter = painterResource(id = R.drawable.ic_location_on),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(72.dp)
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Title
+        Text(
+            text = stringResource(R.string.no_location_title),
+            style = MaterialTheme.typography.headlineSmall.copy(
+                fontWeight = FontWeight.Bold
+            ),
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Description
+        Text(
+            text = stringResource(R.string.no_location_description),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Suggestions card
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+            ),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.no_location_suggestions),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                modifier = Modifier.padding(16.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // Action buttons
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            // Retry button
+            Button(
+                onClick = onRetryLocation,
+                colors = ButtonColors(
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    disabledContentColor = MaterialTheme.colorScheme.onSecondary,
+                    disabledContainerColor = MaterialTheme.colorScheme.onSecondaryContainer
+                ),
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Refresh,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.retry_location_button),
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            // Open settings button
+            OutlinedButton(
+                onClick = onOpenSettings,
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.open_settings_button),
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            // Close app button
+            OutlinedButton(
+                onClick = onCloseApp,
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_close),
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.close_app_button),
+                    fontWeight = FontWeight.Medium
+                )
+            }
         }
     }
 }
