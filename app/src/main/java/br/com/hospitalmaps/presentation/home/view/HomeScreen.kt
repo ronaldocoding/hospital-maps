@@ -127,7 +127,7 @@ private fun HomeContent(
         rememberMarkerState(position = point)
     }
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(userPoint, 12f)
+        position = CameraPosition.fromLatLngZoom(userPoint, 10f)
     }
     val isDarkTheme = isSystemInDarkTheme()
     val mapProperties by remember {
@@ -152,25 +152,29 @@ private fun HomeContent(
         Scaffold(
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
             floatingActionButton = {
-                IconButton(
-                    modifier = Modifier
-                        .size(56.dp)
-                        .background(
-                            color = MaterialTheme.colorScheme.onSurface,
-                            shape = RoundedCornerShape(12.dp)
-                        ),
-                    onClick = {
-                        onNavigate(hospitalPoints[0])
-                    }
+                Box(
+                    modifier = Modifier.padding(bottom = bottomBarHeightDp())
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.image_hospital_maps),
-                        contentDescription = null,
-                        tint = Color.Unspecified,
+                    IconButton(
                         modifier = Modifier
-                            .padding(12.dp)
-                            .size(32.dp)
-                    )
+                            .size(56.dp)
+                            .background(
+                                color = MaterialTheme.colorScheme.onSurface,
+                                shape = RoundedCornerShape(12.dp)
+                            ),
+                        onClick = {
+                            onNavigate(hospitalPoints[0])
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.image_hospital_maps),
+                            contentDescription = null,
+                            tint = Color.Unspecified,
+                            modifier = Modifier
+                                .padding(12.dp)
+                                .size(32.dp)
+                        )
+                    }
                 }
             }
         ) { innerPadding ->
