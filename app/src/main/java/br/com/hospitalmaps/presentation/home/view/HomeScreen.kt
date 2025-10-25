@@ -144,7 +144,8 @@ private fun HomeContent(
     val uiSettings by remember {
         mutableStateOf(
             MapUiSettings(
-                zoomControlsEnabled = false
+                zoomControlsEnabled = false,
+                mapToolbarEnabled = false
             )
         )
     }
