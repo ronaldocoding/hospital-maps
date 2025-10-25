@@ -150,7 +150,6 @@ private fun HomeContent(
         position = CameraPosition.fromLatLngZoom(userPoint, 10f)
     }
 
-    // State for selected marker
     var selectedMarkerIndex by remember { mutableStateOf<Int?>(null) }
 
     val isDarkTheme = isSystemInDarkTheme()
@@ -186,7 +185,7 @@ private fun HomeContent(
         userLocation.isEmpty() -> {
             EmptyLocationState(
                 onRetryLocation = {
-                    viewModel.onAction(HomeAction.OnInit) // Retry getting location
+                    viewModel.onAction(HomeAction.OnInit)
                 },
                 onOpenSettings = {
                     val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
@@ -237,7 +236,7 @@ private fun HomeContent(
                     onMapLoaded = { viewModel.onAction(HomeAction.OnMapLoaded) },
                     onMapClick = {
                         selectedMarkerIndex = null
-                    }, // Close info window when map is clicked
+                    },
                     properties = mapProperties,
                     contentPadding = PaddingValues(
                         top = statusBarHeightDp(),
@@ -247,7 +246,6 @@ private fun HomeContent(
                 ) {
                     hospitalMarkerStates.forEachIndexed { index, markerState ->
                         if (selectedMarkerIndex == index) {
-                            // Show MarkerInfoWindow with custom content for selected marker
                             MarkerInfoWindow(
                                 state = markerState,
                                 onInfoWindowClick = {
@@ -277,12 +275,11 @@ private fun HomeContent(
                                 )
                             }
                         } else {
-                            // Show regular marker for non-selected markers
                             Marker(
                                 state = markerState,
                                 onClick = {
                                     selectedMarkerIndex = index
-                                    true // Return true to consume the click
+                                    true
                                 }
                             )
                         }
@@ -335,7 +332,6 @@ private fun HospitalInfoCard(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Hospital Name
             Text(
                 text = hospitalName,
                 style = MaterialTheme.typography.titleMedium.copy(
@@ -347,13 +343,12 @@ private fun HospitalInfoCard(
                 overflow = TextOverflow.Ellipsis
             )
 
-            // Distance
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_location_on), // You may need to add this icon or use another
+                    painter = painterResource(id = R.drawable.ic_location_on),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(16.dp)
@@ -375,13 +370,13 @@ private fun HospitalInfoCard(
                 shape = RoundedCornerShape(8.dp)
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_navigation), // You may need to add this icon or use another
+                    painter = painterResource(id = R.drawable.ic_navigation),
                     contentDescription = null,
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = stringResource(R.string.navigate_to_hospital), // Add this string resource
+                    text = stringResource(R.string.navigate_to_hospital),
                     fontWeight = FontWeight.Medium
                 )
             }
@@ -399,7 +394,6 @@ private fun EmptyHospitalsState(onCloseApp: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Hospital icon
         Icon(
             painter = painterResource(id = R.drawable.image_hospital_maps),
             contentDescription = null,
@@ -409,7 +403,6 @@ private fun EmptyHospitalsState(onCloseApp: () -> Unit) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Title
         Text(
             text = stringResource(R.string.no_hospitals_title),
             style = MaterialTheme.typography.headlineSmall.copy(
@@ -421,7 +414,6 @@ private fun EmptyHospitalsState(onCloseApp: () -> Unit) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Description
         Text(
             text = stringResource(R.string.no_hospitals_description),
             style = MaterialTheme.typography.bodyLarge,
@@ -431,7 +423,6 @@ private fun EmptyHospitalsState(onCloseApp: () -> Unit) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Suggestions card
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
@@ -450,7 +441,6 @@ private fun EmptyHospitalsState(onCloseApp: () -> Unit) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Close app button
         Button(
             onClick = onCloseApp,
             colors = ButtonColors(
@@ -490,7 +480,6 @@ private fun EmptyLocationState(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Location icon
         Icon(
             painter = painterResource(id = R.drawable.ic_location_on),
             contentDescription = null,
@@ -500,7 +489,6 @@ private fun EmptyLocationState(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Title
         Text(
             text = stringResource(R.string.no_location_title),
             style = MaterialTheme.typography.headlineSmall.copy(
@@ -512,7 +500,6 @@ private fun EmptyLocationState(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Description
         Text(
             text = stringResource(R.string.no_location_description),
             style = MaterialTheme.typography.bodyLarge,
@@ -522,7 +509,6 @@ private fun EmptyLocationState(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Suggestions card
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
@@ -541,12 +527,10 @@ private fun EmptyLocationState(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Action buttons
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Retry button
             Button(
                 onClick = onRetryLocation,
                 colors = ButtonColors(
@@ -570,7 +554,6 @@ private fun EmptyLocationState(
                 )
             }
 
-            // Open settings button
             OutlinedButton(
                 onClick = onOpenSettings,
                 shape = RoundedCornerShape(8.dp),
@@ -588,7 +571,6 @@ private fun EmptyLocationState(
                 )
             }
 
-            // Close app button
             OutlinedButton(
                 onClick = onCloseApp,
                 shape = RoundedCornerShape(8.dp),
