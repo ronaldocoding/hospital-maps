@@ -168,94 +168,113 @@ private fun HomeContent(
         )
     }
 
-    if (nearbyHospitals.isEmpty().not() && userLocation.isEmpty().not()) {
-        Scaffold(
-            contentWindowInsets = WindowInsets(0, 0, 0, 0),
-            floatingActionButton = {
-                Box(
-                    modifier = Modifier.padding(bottom = bottomBarHeightDp())
-                ) {
-                    IconButton(
-                        modifier = Modifier
-                            .size(56.dp)
-                            .background(
-                                color = MaterialTheme.colorScheme.onSurface,
-                                shape = RoundedCornerShape(12.dp)
-                            ),
-                        onClick = {
-                            onNavigate(hospitalPoints[0])
-                        }
+    when {
+        nearbyHospitals.isEmpty() -> {
+            // TODO: Show empty state
+        }
+
+        userLocation.isEmpty() -> {
+            // TODO: Show no location state
+        }
+
+        else -> {
+            Scaffold(
+                contentWindowInsets = WindowInsets(0, 0, 0, 0),
+                floatingActionButton = {
+                    Box(
+                        modifier = Modifier.padding(bottom = bottomBarHeightDp())
                     ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.image_hospital_maps),
-                            contentDescription = null,
-                            tint = Color.Unspecified,
+                        IconButton(
                             modifier = Modifier
-                                .padding(12.dp)
-                                .size(32.dp)
-                        )
+                                .size(56.dp)
+                                .background(
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    shape = RoundedCornerShape(12.dp)
+                                ),
+                            onClick = {
+                                onNavigate(hospitalPoints[0])
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.image_hospital_maps),
+                                contentDescription = null,
+                                tint = Color.Unspecified,
+                                modifier = Modifier
+                                    .padding(12.dp)
+                                    .size(32.dp)
+                            )
+                        }
                     }
                 }
-            }
-        ) { innerPadding ->
-            GoogleMap(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .alpha(if (uiState.uiModel.isMapLoading) 0f else 1f)
-                    .padding(innerPadding),
-                cameraPositionState = cameraPositionState,
-                onMapLoaded = { viewModel.onAction(HomeAction.OnMapLoaded) },
-                onMapClick = { selectedMarkerIndex = null }, // Close info window when map is clicked
-                properties = mapProperties,
-                contentPadding = PaddingValues(
-                    top = statusBarHeightDp(),
-                    bottom = bottomBarHeightDp()
-                ),
-                uiSettings = uiSettings
-            ) {
-                hospitalMarkerStates.forEachIndexed { index, markerState ->
-                    if (selectedMarkerIndex == index) {
-                        // Show MarkerInfoWindow with custom content for selected marker
-                        MarkerInfoWindow(
-                            state = markerState,
-                            onInfoWindowClick = {
-                                Log.d(
-                                    "HomeScreen",
-                                    "Hospital selected: ${nearbyHospitals[index].name}, navigating to details..."
-                                )
-                                Log.d("HomeScreen", "Hospital coordinates: ${hospitalPoints[index]}")
-                                onNavigate(hospitalPoints[index])
-                            }
-                        ) { _ ->
-                            HospitalInfoCard(
-                                hospitalName = nearbyHospitals[index].name,
-                                distance = stringResource(
-                                    R.string.distance_from_user,
-                                    nearbyHospitals[index].distanceFromCenter
-                                ),
-                                onNavigateClick = {
+            ) { innerPadding ->
+                GoogleMap(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .alpha(if (uiState.uiModel.isMapLoading) 0f else 1f)
+                        .padding(innerPadding),
+                    cameraPositionState = cameraPositionState,
+                    onMapLoaded = { viewModel.onAction(HomeAction.OnMapLoaded) },
+                    onMapClick = {
+                        selectedMarkerIndex = null
+                    }, // Close info window when map is clicked
+                    properties = mapProperties,
+                    contentPadding = PaddingValues(
+                        top = statusBarHeightDp(),
+                        bottom = bottomBarHeightDp()
+                    ),
+                    uiSettings = uiSettings
+                ) {
+                    hospitalMarkerStates.forEachIndexed { index, markerState ->
+                        if (selectedMarkerIndex == index) {
+                            // Show MarkerInfoWindow with custom content for selected marker
+                            MarkerInfoWindow(
+                                state = markerState,
+                                onInfoWindowClick = {
+                                    Log.d(
+                                        "HomeScreen",
+                                        "Hospital selected: ${nearbyHospitals[index].name}, navigating to details..."
+                                    )
+                                    Log.d(
+                                        "HomeScreen",
+                                        "Hospital coordinates: ${hospitalPoints[index]}"
+                                    )
                                     onNavigate(hospitalPoints[index])
-                                },
-                                onDismiss = {
-                                    selectedMarkerIndex = null
+                                }
+                            ) { _ ->
+                                HospitalInfoCard(
+                                    hospitalName = nearbyHospitals[index].name,
+                                    distance = stringResource(
+                                        R.string.distance_from_user,
+                                        nearbyHospitals[index].distanceFromCenter
+                                    ),
+                                    onNavigateClick = {
+                                        onNavigate(hospitalPoints[index])
+                                    },
+                                    onDismiss = {
+                                        selectedMarkerIndex = null
+                                    }
+                                )
+                            }
+                        } else {
+                            // Show regular marker for non-selected markers
+                            Marker(
+                                state = markerState,
+                                onClick = {
+                                    selectedMarkerIndex = index
+                                    true // Return true to consume the click
                                 }
                             )
                         }
-                    } else {
-                        // Show regular marker for non-selected markers
-                        Marker(
-                            state = markerState,
-                            onClick = {
-                                selectedMarkerIndex = index
-                                true // Return true to consume the click
-                            }
-                        )
                     }
                 }
             }
         }
     }
-    if (uiState.uiModel.isMapLoading) {
+
+    if (uiState.uiModel.isMapLoading
+        && userLocation.isEmpty().not()
+        && nearbyHospitals.isNotEmpty()
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
