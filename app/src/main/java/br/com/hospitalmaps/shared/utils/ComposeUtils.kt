@@ -1,4 +1,4 @@
-package br.com.hospitalmaps.shared
+package br.com.hospitalmaps.shared.utils
 
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues

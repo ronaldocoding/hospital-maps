@@ -1,6 +1,7 @@
 package br.com.hospitalmaps.presentation.home.view
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.provider.Settings
 import android.util.Log
@@ -59,8 +60,9 @@ import br.com.hospitalmaps.R
 import br.com.hospitalmaps.presentation.home.action.HomeAction
 import br.com.hospitalmaps.presentation.home.state.HomeUiState
 import br.com.hospitalmaps.presentation.home.viewmodel.HomeViewModel
-import br.com.hospitalmaps.shared.bottomBarHeightDp
-import br.com.hospitalmaps.shared.statusBarHeightDp
+import br.com.hospitalmaps.shared.utils.DistanceFormatter
+import br.com.hospitalmaps.shared.utils.bottomBarHeightDp
+import br.com.hospitalmaps.shared.utils.statusBarHeightDp
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
@@ -256,11 +258,9 @@ private fun HomeContent(
                             }
                         ) { _ ->
                             HospitalInfoCard(
+                                context = context,
                                 hospitalName = nearbyHospitals[index].name,
-                                distance = stringResource(
-                                    R.string.distance_from_user,
-                                    nearbyHospitals[index].distanceFromCenter
-                                ),
+                                distance = nearbyHospitals[index].distanceFromCenter,
                                 onNavigateClick = {
                                     onNavigate(nearbyHospitals[index].placeId)
                                 }
@@ -289,8 +289,9 @@ private fun HomeContent(
 
 @Composable
 private fun HospitalInfoCard(
+    context: Context,
     hospitalName: String,
-    distance: String,
+    distance: Float,
     onNavigateClick: () -> Unit
 ) {
     Card(
@@ -333,10 +334,28 @@ private fun HospitalInfoCard(
                     modifier = Modifier.size(16.dp)
                 )
                 Text(
-                    text = distance,
-                    style = MaterialTheme.typography.bodyMedium,
+                    text = stringResource(
+                        R.string.distance_from_user,
+                        DistanceFormatter.formatDistance(
+                            context,
+                            distance
+                        )
+                    ),
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontWeight = FontWeight.Medium
+                    ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+
+                if (distance < 500f) {
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = stringResource(R.string.close_distance),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
 
             OutlinedButton(

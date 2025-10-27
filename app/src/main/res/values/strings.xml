@@ -15,7 +15,11 @@
     <!-- Home Screen -->
     <string name="home_error_title">Ocorreu um erro inesperado</string>
     <string name="home_error_button_label">Tentar novamente</string>
-    <string name="distance_from_user">Distância: %s km</string>
+    <string name="distance_from_user">Distância: %s</string>
+    <string name="distance_in_meters">%d metros</string>
+    <string name="distance_in_kilometers">%d km</string>
+    <string name="distance_in_kilometers_precise">%s km</string>
+    <string name="close_distance">• Muito próximo</string>
     <string name="navigate_to_hospital">Navegar</string>
     <string name="no_hospitals_title">Nenhum hospital encontrado</string>
     <string name="no_hospitals_description">Não foi possível encontrar hospitais próximos à sua localização atual. Isso pode acontecer em áreas rurais ou remotas.</string>

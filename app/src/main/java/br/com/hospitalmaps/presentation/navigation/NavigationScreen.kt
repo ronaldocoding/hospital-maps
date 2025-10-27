@@ -21,8 +21,8 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import br.com.hospitalmaps.R
 import br.com.hospitalmaps.databinding.NavigationFragmentLayoutBinding
-import br.com.hospitalmaps.shared.bottomBarHeightDp
-import br.com.hospitalmaps.shared.statusBarHeightDp
+import br.com.hospitalmaps.shared.utils.bottomBarHeightDp
+import br.com.hospitalmaps.shared.utils.statusBarHeightDp
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.libraries.navigation.NavigationApi
