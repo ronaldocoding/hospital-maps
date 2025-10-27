@@ -41,7 +41,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -68,7 +68,6 @@ import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerInfoWindow
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
@@ -79,8 +78,11 @@ fun HomeScreen(onBackButtonClick: () -> Unit, onNavigate: (placeId: String) -> U
     val viewModel: HomeViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    val isInitialized = rememberSaveable { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
-        viewModel.onAction(HomeAction.OnInit)
+        if (isInitialized.value.not()) viewModel.onAction(HomeAction.OnInit)
+        isInitialized.value = true
     }
 
     BackHandler { onBackButtonClick.invoke() }
@@ -150,9 +152,6 @@ private fun HomeContent(
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(userPoint, 10f)
     }
-
-    var selectedMarkerIndex by remember { mutableStateOf<Int?>(null) }
-
     val isDarkTheme = isSystemInDarkTheme()
     val mapProperties by remember {
         mutableStateOf(
@@ -235,9 +234,6 @@ private fun HomeContent(
                         .padding(innerPadding),
                     cameraPositionState = cameraPositionState,
                     onMapLoaded = { viewModel.onAction(HomeAction.OnMapLoaded) },
-                    onMapClick = {
-                        selectedMarkerIndex = null
-                    },
                     properties = mapProperties,
                     contentPadding = PaddingValues(
                         top = statusBarHeightDp(),
@@ -246,41 +242,28 @@ private fun HomeContent(
                     uiSettings = uiSettings
                 ) {
                     hospitalMarkerStates.forEachIndexed { index, markerState ->
-                        if (selectedMarkerIndex == index) {
-                            MarkerInfoWindow(
-                                state = markerState,
-                                onInfoWindowClick = {
-                                    Log.d(
-                                        "HomeScreen",
-                                        "Hospital selected: ${nearbyHospitals[index].name}, navigating to details..."
-                                    )
-                                    Log.d(
-                                        "HomeScreen",
-                                        "Hospital coordinates: ${hospitalPoints[index]}"
-                                    )
-                                    onNavigate(nearbyHospitals[index].placeId)
-                                }
-                            ) { _ ->
-                                HospitalInfoCard(
-                                    hospitalName = nearbyHospitals[index].name,
-                                    distance = stringResource(
-                                        R.string.distance_from_user,
-                                        nearbyHospitals[index].distanceFromCenter
-                                    ),
-                                    onNavigateClick = {
-                                        onNavigate(nearbyHospitals[index].placeId)
-                                    },
-                                    onDismiss = {
-                                        selectedMarkerIndex = null
-                                    }
+                        MarkerInfoWindow(
+                            state = markerState,
+                            onInfoWindowClick = {
+                                Log.d(
+                                    "HomeScreen",
+                                    "Hospital selected: ${nearbyHospitals[index].name}, navigating to details..."
                                 )
+                                Log.d(
+                                    "HomeScreen",
+                                    "Hospital coordinates: ${hospitalPoints[index]}"
+                                )
+                                onNavigate(nearbyHospitals[index].placeId)
                             }
-                        } else {
-                            Marker(
-                                state = markerState,
-                                onClick = {
-                                    selectedMarkerIndex = index
-                                    true
+                        ) { _ ->
+                            HospitalInfoCard(
+                                hospitalName = nearbyHospitals[index].name,
+                                distance = stringResource(
+                                    R.string.distance_from_user,
+                                    nearbyHospitals[index].distanceFromCenter
+                                ),
+                                onNavigateClick = {
+                                    onNavigate(nearbyHospitals[index].placeId)
                                 }
                             )
                         }
@@ -309,8 +292,7 @@ private fun HomeContent(
 private fun HospitalInfoCard(
     hospitalName: String,
     distance: String,
-    onNavigateClick: () -> Unit,
-    onDismiss: () -> Unit
+    onNavigateClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -361,7 +343,6 @@ private fun HospitalInfoCard(
             OutlinedButton(
                 onClick = {
                     onNavigateClick()
-                    onDismiss()
                 },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp)
