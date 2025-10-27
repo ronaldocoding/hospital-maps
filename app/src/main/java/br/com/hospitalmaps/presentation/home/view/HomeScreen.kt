@@ -56,7 +56,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.com.hospitalmaps.R
-import br.com.hospitalmaps.data.model.UserLocationData
 import br.com.hospitalmaps.presentation.home.action.HomeAction
 import br.com.hospitalmaps.presentation.home.state.HomeUiState
 import br.com.hospitalmaps.presentation.home.viewmodel.HomeViewModel
@@ -568,5 +567,3 @@ private fun EmptyLocationState(
         }
     }
 }
-
-fun UserLocationData.isEmpty() = latitude == 0.0 && longitude == 0.0
