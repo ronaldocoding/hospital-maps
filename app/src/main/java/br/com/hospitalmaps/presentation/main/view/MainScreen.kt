@@ -51,6 +51,9 @@ fun MainScreen() {
                     Log.d("MainScreen", "Navigating to place ID: $placeId")
                     navController.currentBackStackEntry?.savedStateHandle?.set("destinationPlaceId", placeId)
                     navController.navigate(Route.Navigation)
+                },
+                onPersonalInfoClick = {
+                    // TODO: navigate to PersonalInfoScreen
                 }
             )
         }

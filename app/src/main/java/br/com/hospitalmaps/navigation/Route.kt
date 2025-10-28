@@ -11,4 +11,7 @@ object Route {
 
     @Serializable
     data object Navigation
+
+    @Serializable
+    data object PersonalInfo
 }

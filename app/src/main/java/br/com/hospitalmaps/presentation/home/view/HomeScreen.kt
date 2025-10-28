@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
@@ -75,7 +76,11 @@ import com.google.maps.android.compose.rememberMarkerState
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun HomeScreen(onBackButtonClick: () -> Unit, onNavigate: (placeId: String) -> Unit) {
+fun HomeScreen(
+    onBackButtonClick: () -> Unit,
+    onNavigate: (placeId: String) -> Unit,
+    onPersonalInfoClick: () -> Unit = {}
+) {
     val viewModel: HomeViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -103,7 +108,12 @@ fun HomeScreen(onBackButtonClick: () -> Unit, onNavigate: (placeId: String) -> U
             }
 
             is HomeUiState.Success -> {
-                HomeContent(uiState, viewModel, onNavigate)
+                HomeContent(
+                    uiState,
+                    viewModel,
+                    onNavigate,
+                    onPersonalInfoClick
+                )
             }
 
             is HomeUiState.Error -> {
@@ -137,7 +147,8 @@ fun HomeScreen(onBackButtonClick: () -> Unit, onNavigate: (placeId: String) -> U
 private fun HomeContent(
     uiState: HomeUiState,
     viewModel: HomeViewModel,
-    onNavigate: (placeId: String) -> Unit
+    onNavigate: (placeId: String) -> Unit,
+    onPersonalInfoClick: () -> Unit,
 ) {
     val context = LocalContext.current
     val userLocation = (uiState as HomeUiState.Success).uiModel.userLocationData
@@ -267,6 +278,27 @@ private fun HomeContent(
                             )
                         }
                     }
+                }
+            }
+
+            Box(
+                contentAlignment = Alignment.TopStart,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = statusBarHeightDp() + 16.dp, start = 16.dp,)
+            ) {
+                IconButton(
+                    modifier = Modifier.background(
+                        color = MaterialTheme.colorScheme.onSurface,
+                        shape = RoundedCornerShape(12.dp)
+                    ),
+                    onClick = onPersonalInfoClick
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.surface
+                    )
                 }
             }
 
