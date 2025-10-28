@@ -224,11 +224,68 @@ private fun HomeContent(
                 floatingActionButton = {
                     Column(
                         modifier = Modifier
-                            .padding(bottom = bottomBarHeightDp(), end = 16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                            .padding(bottom = bottomBarHeightDp()),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        // Zoom to User Location Button
+
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .background(
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    shape = RoundedCornerShape(12.dp)
+                                )
+                                .clickable(
+                                    indication = ripple(),
+                                    interactionSource = remember { MutableInteractionSource() }
+                                ) {
+                                    scope.launch {
+                                        cameraPositionState.animate(
+                                            CameraUpdateFactory.zoomIn()
+                                        )
+                                    }
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_plus),
+                                contentDescription = "Zoom In",
+                                tint = MaterialTheme.colorScheme.surface,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+
+                        Spacer(Modifier.height(2.dp))
+
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .background(
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    shape = RoundedCornerShape(12.dp)
+                                )
+                                .clickable(
+                                    indication = ripple(),
+                                    interactionSource = remember { MutableInteractionSource() }
+                                ) {
+                                    scope.launch {
+                                        cameraPositionState.animate(
+                                            CameraUpdateFactory.zoomOut()
+                                        )
+                                    }
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_minus),
+                                contentDescription = "Zoom Out",
+                                tint = MaterialTheme.colorScheme.surface,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+
+                        Spacer(Modifier.height(12.dp))
+
                         Box(
                             modifier = Modifier
                                 .size(48.dp)
@@ -258,7 +315,8 @@ private fun HomeContent(
                             )
                         }
 
-                        // Navigate to Closest Hospital Button (existing)
+                        Spacer(Modifier.height(12.dp))
+
                         IconButton(
                             modifier = Modifier
                                 .size(56.dp)
