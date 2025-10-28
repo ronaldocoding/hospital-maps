@@ -6,11 +6,14 @@ import br.com.hospitalmaps.data.repository.UserLocationRepository
 import br.com.hospitalmaps.data.model.UserLocationData
 import br.com.hospitalmaps.data.repository.HospitalRepository
 import br.com.hospitalmaps.presentation.home.action.HomeAction
+import br.com.hospitalmaps.presentation.home.effect.HomeUiEffect
 import br.com.hospitalmaps.presentation.home.state.HomeUiModel
 import br.com.hospitalmaps.presentation.home.state.HomeUiState
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
@@ -18,6 +21,10 @@ class HomeViewModel(
     private val hospitalRepository: HospitalRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.LoadingUserData)
+
+    private val _uiEffect = Channel<HomeUiEffect>()
+    val uiEffect = _uiEffect.receiveAsFlow()
+
     val uiState = _uiState.asStateFlow()
 
     fun onAction(action: HomeAction) {
@@ -25,6 +32,7 @@ class HomeViewModel(
             HomeAction.OnInit -> handleOnInit()
             HomeAction.OnMapLoaded -> handleOnMapLoaded()
             HomeAction.TryAgain -> handleOnInit()
+            HomeAction.OnZoomToUserClicked -> handleOnZoomToUserClicked()
         }
     }
 
@@ -60,6 +68,12 @@ class HomeViewModel(
         val currentUiModel = (_uiState.value as? HomeUiState.Success)?.uiModel
         with(checkNotNull(currentUiModel)) {
             _uiState.value = HomeUiState.Success(this@with.copy(isMapLoading = false))
+        }
+    }
+
+    private fun handleOnZoomToUserClicked() {
+        viewModelScope.launch {
+            _uiEffect.send(HomeUiEffect.ZoomToUser)
         }
     }
 }

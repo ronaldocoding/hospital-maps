@@ -7,6 +7,8 @@ import android.provider.Settings
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
@@ -38,11 +41,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,6 +69,7 @@ import br.com.hospitalmaps.presentation.home.viewmodel.HomeViewModel
 import br.com.hospitalmaps.shared.utils.DistanceFormatter
 import br.com.hospitalmaps.shared.utils.bottomBarHeightDp
 import br.com.hospitalmaps.shared.utils.statusBarHeightDp
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
@@ -73,6 +79,7 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MarkerInfoWindow
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -180,10 +187,12 @@ private fun HomeContent(
         mutableStateOf(
             MapUiSettings(
                 zoomControlsEnabled = false,
-                mapToolbarEnabled = false
+                mapToolbarEnabled = false,
+                myLocationButtonEnabled = false
             )
         )
     }
+    val scope = rememberCoroutineScope()
 
     when {
         userLocation.isEmpty() -> {
@@ -213,9 +222,43 @@ private fun HomeContent(
             Scaffold(
                 contentWindowInsets = WindowInsets(0, 0, 0, 0),
                 floatingActionButton = {
-                    Box(
-                        modifier = Modifier.padding(bottom = bottomBarHeightDp())
+                    Column(
+                        modifier = Modifier
+                            .padding(bottom = bottomBarHeightDp(), end = 16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
+                        // Zoom to User Location Button
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .background(
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    shape = CircleShape
+                                )
+                                .clickable(
+                                    indication = ripple(),
+                                    interactionSource = remember { MutableInteractionSource() }
+                                ) {
+                                    scope.launch {
+                                        cameraPositionState.animate(
+                                            CameraUpdateFactory.newCameraPosition(
+                                                CameraPosition.fromLatLngZoom(userPoint, 15f)
+                                            )
+                                        )
+                                    }
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_target),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.surface,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+
+                        // Navigate to Closest Hospital Button (existing)
                         IconButton(
                             modifier = Modifier
                                 .size(56.dp)
@@ -285,7 +328,7 @@ private fun HomeContent(
                 contentAlignment = Alignment.TopStart,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = statusBarHeightDp() + 16.dp, start = 16.dp,)
+                    .padding(top = statusBarHeightDp() + 16.dp, start = 16.dp)
             ) {
                 IconButton(
                     modifier = Modifier.background(
