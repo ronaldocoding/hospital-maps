@@ -30,4 +30,29 @@
     <string name="no_location_suggestions">Para resolver este problema:\n• Verifique se a localização está ativada no seu dispositivo\n• Certifique-se de que o app tem permissão para acessar sua localização\n• Tente sair e voltar para uma área com melhor sinal GPS</string>
     <string name="retry_location_button">Tentar novamente</string>
     <string name="open_settings_button">Abrir configurações</string>
+
+    <!-- Sign Up Screen -->
+    <string name="signup_title">Criar Conta</string>
+    <string name="signup_subtitle">Cadastre-se para começar</string>
+    <string name="signup_email_label">Email</string>
+    <string name="signup_email_content_description">Ícone de email</string>
+    <string name="signup_password_label">Senha</string>
+    <string name="signup_confirm_password_label">Confirmar Senha</string>
+    <string name="signup_password_icon_content_description">Ícone de senha</string>
+    <string name="signup_password_visibility_toggle">Alternar visibilidade da senha</string>
+    <string name="signup_button">Cadastrar</string>
+    <string name="signup_password_mismatch_error">As senhas não correspondem</string>
+    <string name="signup_login_link">Já tem uma conta? Faça login</string>
+
+    <!-- Login Screen -->
+    <string name="login_title">Bem-vindo</string>
+    <string name="login_subtitle">Faça login para continuar</string>
+    <string name="login_email_label">Email</string>
+    <string name="login_email_content_description">Ícone de email</string>
+    <string name="login_password_label">Senha</string>
+    <string name="login_password_icon_content_description">Ícone de senha</string>
+    <string name="login_password_visibility_toggle">Alternar visibilidade da senha</string>
+    <string name="login_button">Entrar</string>
+    <string name="login_forgot_password">Esqueceu sua senha?</string>
+    <string name="login_signup_link">Não tem uma conta? Cadastre-se</string>
 </resources>
