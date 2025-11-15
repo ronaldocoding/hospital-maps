@@ -6,9 +6,10 @@ import br.com.hospitalmaps.data.repository.UserLocationRepository
 import br.com.hospitalmaps.data.model.UserLocationData
 import br.com.hospitalmaps.data.repository.HospitalRepository
 import br.com.hospitalmaps.presentation.home.action.HomeAction
-import br.com.hospitalmaps.presentation.home.effect.HomeUiEffect
+import br.com.hospitalmaps.presentation.home.event.HomeEvent
 import br.com.hospitalmaps.presentation.home.state.HomeUiModel
 import br.com.hospitalmaps.presentation.home.state.HomeUiState
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,18 +22,19 @@ class HomeViewModel(
     private val hospitalRepository: HospitalRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.LoadingUserData)
-
-    private val _uiEffect = Channel<HomeUiEffect>()
-    val uiEffect = _uiEffect.receiveAsFlow()
-
     val uiState = _uiState.asStateFlow()
+
+    private val _event = Channel<HomeEvent>()
+    val event = _event.receiveAsFlow()
 
     fun onAction(action: HomeAction) {
         when (action) {
-            HomeAction.OnInit -> handleOnInit()
+            HomeAction.OnInitialized -> handleOnInit()
             HomeAction.OnMapLoaded -> handleOnMapLoaded()
-            HomeAction.TryAgain -> handleOnInit()
-            HomeAction.OnZoomToUserClicked -> handleOnZoomToUserClicked()
+            HomeAction.OnTryAgainClicked -> handleOnInit()
+            is HomeAction.OnZoomInUserClicked -> handleOnZoomToUserClicked(action.userPoint)
+            HomeAction.OnZoomInMapClicked -> handleOnZoomInMapClicked()
+            HomeAction.OnZoomOutMapClicked -> handleOnZoomOutMapClicked()
         }
     }
 
@@ -71,9 +73,21 @@ class HomeViewModel(
         }
     }
 
-    private fun handleOnZoomToUserClicked() {
+    private fun handleOnZoomToUserClicked(userPoint: LatLng) {
         viewModelScope.launch {
-            _uiEffect.send(HomeUiEffect.ZoomToUser)
+            _event.send(HomeEvent.ZoomInUser(userPoint))
+        }
+    }
+
+    private fun handleOnZoomInMapClicked() {
+        viewModelScope.launch {
+            _event.send(HomeEvent.ZoomInMap)
+        }
+    }
+
+    private fun handleOnZoomOutMapClicked() {
+        viewModelScope.launch {
+            _event.send(HomeEvent.ZoomOutMap)
         }
     }
 }

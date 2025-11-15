@@ -65,15 +65,18 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.com.hospitalmaps.R
 import br.com.hospitalmaps.presentation.home.action.HomeAction
+import br.com.hospitalmaps.presentation.home.event.HomeEvent
 import br.com.hospitalmaps.presentation.home.state.HomeUiState
 import br.com.hospitalmaps.presentation.home.viewmodel.HomeViewModel
 import br.com.hospitalmaps.shared.utils.DistanceFormatter
+import br.com.hospitalmaps.shared.utils.ObserveAsEvents
 import br.com.hospitalmaps.shared.utils.bottomBarHeightDp
 import br.com.hospitalmaps.shared.utils.statusBarHeightDp
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
@@ -91,15 +94,51 @@ fun HomeScreen(
 ) {
     val viewModel: HomeViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
+    val userLocation = (uiState as? HomeUiState.Success)?.uiModel?.userLocationData
+    val userPoint = LatLng(userLocation?.latitude ?: 0.0, userLocation?.longitude ?: 0.0)
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(userPoint, 10f)
+    }
 
     val isInitialized = rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        if (isInitialized.value.not()) viewModel.onAction(HomeAction.OnInit)
+        if (isInitialized.value.not()) viewModel.onAction(HomeAction.OnInitialized)
         isInitialized.value = true
     }
 
     BackHandler { onBackButtonClick.invoke() }
+
+    ObserveAsEvents(viewModel.event) { event ->
+        when (event) {
+            is HomeEvent.ZoomInUser -> {
+                scope.launch {
+                    cameraPositionState.animate(
+                        CameraUpdateFactory.newCameraPosition(
+                            CameraPosition.fromLatLngZoom(event.userPoint, 15f)
+                        )
+                    )
+                }
+            }
+
+            HomeEvent.ZoomInMap -> {
+                scope.launch {
+                    cameraPositionState.animate(
+                        CameraUpdateFactory.zoomIn()
+                    )
+                }
+            }
+
+            HomeEvent.ZoomOutMap -> {
+                scope.launch {
+                    cameraPositionState.animate(
+                        CameraUpdateFactory.zoomOut()
+                    )
+                }
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -118,9 +157,11 @@ fun HomeScreen(
             is HomeUiState.Success -> {
                 HomeContent(
                     uiState,
+                    cameraPositionState,
                     viewModel,
                     onNavigate,
-                    onPersonalInfoClick
+                    onPersonalInfoClick,
+                    viewModel::onAction
                 )
             }
 
@@ -139,7 +180,7 @@ fun HomeScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(
-                        onClick = { viewModel.onAction(HomeAction.TryAgain) },
+                        onClick = { viewModel.onAction(HomeAction.OnTryAgainClicked) },
                         colors = ButtonColors(
                             contentColor = MaterialTheme.colorScheme.primary,
                             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -158,9 +199,11 @@ fun HomeScreen(
 @Composable
 private fun HomeContent(
     uiState: HomeUiState,
+    cameraPositionState: CameraPositionState,
     viewModel: HomeViewModel,
     onNavigate: (placeId: String) -> Unit,
     onPersonalInfoClick: () -> Unit,
+    onAction: (HomeAction) -> Unit
 ) {
     val context = LocalContext.current
     val userLocation = (uiState as HomeUiState.Success).uiModel.userLocationData
@@ -172,9 +215,6 @@ private fun HomeContent(
     }
     val hospitalMarkerStates = hospitalPoints.map { point ->
         rememberMarkerState(position = point)
-    }
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(userPoint, 10f)
     }
     val isDarkTheme = isSystemInDarkTheme()
     val mapProperties by remember {
@@ -197,13 +237,12 @@ private fun HomeContent(
             )
         )
     }
-    val scope = rememberCoroutineScope()
 
     when {
         userLocation.isEmpty() -> {
             EmptyLocationState(
                 onRetryLocation = {
-                    viewModel.onAction(HomeAction.OnInit)
+                    viewModel.onAction(HomeAction.OnInitialized)
                 },
                 onOpenSettings = {
                     val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
@@ -242,14 +281,11 @@ private fun HomeContent(
                                 )
                                 .clickable(
                                     indication = ripple(),
-                                    interactionSource = remember { MutableInteractionSource() }
-                                ) {
-                                    scope.launch {
-                                        cameraPositionState.animate(
-                                            CameraUpdateFactory.zoomIn()
-                                        )
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    onClick = {
+                                        onAction(HomeAction.OnZoomInMapClicked)
                                     }
-                                },
+                                ),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
@@ -271,14 +307,11 @@ private fun HomeContent(
                                 )
                                 .clickable(
                                     indication = ripple(),
-                                    interactionSource = remember { MutableInteractionSource() }
-                                ) {
-                                    scope.launch {
-                                        cameraPositionState.animate(
-                                            CameraUpdateFactory.zoomOut()
-                                        )
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    onClick = {
+                                        onAction(HomeAction.OnZoomOutMapClicked)
                                     }
-                                },
+                                ),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
@@ -300,16 +333,11 @@ private fun HomeContent(
                                 )
                                 .clickable(
                                     indication = ripple(),
-                                    interactionSource = remember { MutableInteractionSource() }
-                                ) {
-                                    scope.launch {
-                                        cameraPositionState.animate(
-                                            CameraUpdateFactory.newCameraPosition(
-                                                CameraPosition.fromLatLngZoom(userPoint, 15f)
-                                            )
-                                        )
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    onClick = {
+                                        onAction(HomeAction.OnZoomInUserClicked(userPoint))
                                     }
-                                },
+                                ),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
