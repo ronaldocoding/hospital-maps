@@ -15,6 +15,7 @@ import br.com.hospitalmaps.navigation.Route
 import br.com.hospitalmaps.presentation.home.view.HomeScreen
 import br.com.hospitalmaps.presentation.locationpermission.view.LocationPermissionScreen
 import br.com.hospitalmaps.presentation.locationpermission.view.hasLocationPermissions
+import br.com.hospitalmaps.presentation.login.view.LoginScreen
 import br.com.hospitalmaps.presentation.main.viewmodel.MainViewModel
 import br.com.hospitalmaps.presentation.navigation.NavigationScreen
 import org.koin.androidx.compose.koinViewModel
@@ -53,7 +54,26 @@ fun MainScreen() {
                     navController.navigate(Route.Navigation)
                 },
                 onPersonalInfoClick = {
-                    // TODO: navigate to PersonalInfoScreen
+                    navController.navigate(Route.PersonalInfo)
+                }
+            )
+        }
+        composable<Route.PersonalInfo> {
+            LoginScreen(
+                onLoginClick = { email, password ->
+                    Log.d("MainScreen", "Login with email: $email")
+                    // TODO: Handle login logic here
+                },
+                onForgotPasswordClick = {
+                    Log.d("MainScreen", "Navigating to forgot password")
+                    // TODO: Navigate to ForgotPasswordScreen
+                },
+                onSignUpClick = {
+                    Log.d("MainScreen", "Navigating to sign up")
+                    // TODO: Navigate to SignUpScreen
+                },
+                onBackClick = {
+                    navController.popBackStack()
                 }
             )
         }

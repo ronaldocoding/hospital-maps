@@ -9,4 +9,5 @@ sealed class HomeAction {
     data class OnZoomInUserClicked(val userPoint: LatLng) : HomeAction()
     data object OnZoomInMapClicked : HomeAction()
     data object OnZoomOutMapClicked : HomeAction()
+    data object OnPersonalInfoClicked : HomeAction()
 }

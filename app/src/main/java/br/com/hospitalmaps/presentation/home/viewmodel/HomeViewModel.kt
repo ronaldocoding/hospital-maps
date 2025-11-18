@@ -35,6 +35,7 @@ class HomeViewModel(
             is HomeAction.OnZoomInUserClicked -> handleOnZoomToUserClicked(action.userPoint)
             HomeAction.OnZoomInMapClicked -> handleOnZoomInMapClicked()
             HomeAction.OnZoomOutMapClicked -> handleOnZoomOutMapClicked()
+            HomeAction.OnPersonalInfoClicked -> handleOnPersonalInfoClicked()
         }
     }
 
@@ -88,6 +89,12 @@ class HomeViewModel(
     private fun handleOnZoomOutMapClicked() {
         viewModelScope.launch {
             _event.send(HomeEvent.ZoomOutMap)
+        }
+    }
+
+    private fun handleOnPersonalInfoClicked() {
+        viewModelScope.launch {
+            _event.send(HomeEvent.NavigateToPersonalInfo)
         }
     }
 }

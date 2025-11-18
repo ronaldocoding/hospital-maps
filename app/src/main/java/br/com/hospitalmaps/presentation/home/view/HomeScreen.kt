@@ -137,6 +137,8 @@ fun HomeScreen(
                     )
                 }
             }
+
+            HomeEvent.NavigateToPersonalInfo -> onPersonalInfoClick()
         }
     }
 
@@ -160,7 +162,6 @@ fun HomeScreen(
                     cameraPositionState,
                     viewModel,
                     onNavigate,
-                    onPersonalInfoClick,
                     viewModel::onAction
                 )
             }
@@ -202,7 +203,6 @@ private fun HomeContent(
     cameraPositionState: CameraPositionState,
     viewModel: HomeViewModel,
     onNavigate: (placeId: String) -> Unit,
-    onPersonalInfoClick: () -> Unit,
     onAction: (HomeAction) -> Unit
 ) {
     val context = LocalContext.current
@@ -426,7 +426,9 @@ private fun HomeContent(
                         color = MaterialTheme.colorScheme.onSurface,
                         shape = RoundedCornerShape(12.dp)
                     ),
-                    onClick = onPersonalInfoClick
+                    onClick = {
+                        onAction(HomeAction.OnPersonalInfoClicked)
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.Default.Person,

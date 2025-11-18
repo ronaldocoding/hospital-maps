@@ -6,4 +6,5 @@ sealed interface HomeEvent {
     data class ZoomInUser(val userPoint: LatLng) : HomeEvent
     data object ZoomInMap : HomeEvent
     data object ZoomOutMap : HomeEvent
+    data object NavigateToPersonalInfo : HomeEvent
 }
