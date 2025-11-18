@@ -1,5 +1,6 @@
-package br.com.hospitalmaps.presentation.login
+package br.com.hospitalmaps.presentation.login.view
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,8 +28,11 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -40,20 +44,77 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.com.hospitalmaps.R
+import br.com.hospitalmaps.presentation.login.action.LoginAction
+import br.com.hospitalmaps.presentation.login.event.LoginEvent
+import br.com.hospitalmaps.presentation.login.state.LoginUiState
+import br.com.hospitalmaps.presentation.login.viewmodel.LoginViewModel
+import br.com.hospitalmaps.shared.utils.ObserveAsEvents
 import br.com.hospitalmaps.shared.utils.VisibilityIcon
 import br.com.hospitalmaps.shared.utils.VisibilityOffIcon
 import br.com.hospitalmaps.ui.theme.HospitalMapsAppTheme
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun LoginScreen(
     onLoginClick: (email: String, password: String) -> Unit = { _, _ -> },
     onForgotPasswordClick: () -> Unit = {},
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    onSignUpClick: () -> Unit = {}
 ) {
-    val emailState = remember { mutableStateOf("") }
-    val passwordState = remember { mutableStateOf("") }
-    val showPassword = remember { mutableStateOf(false) }
+    val viewModel: LoginViewModel = koinViewModel()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isInitialized = rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        if (isInitialized.value.not()) viewModel.onAction(LoginAction.OnInitialized)
+        isInitialized.value = true
+    }
+
+    ObserveAsEvents(viewModel.event) { event ->
+        when (event) {
+            LoginEvent.NavigateToHome -> onLoginClick("", "")
+            LoginEvent.NavigateToForgotPassword -> onForgotPasswordClick()
+            LoginEvent.NavigateToSignUp -> onSignUpClick()
+            LoginEvent.NavigateBack -> onBackClick()
+            is LoginEvent.ShowError -> {
+                // TODO: Show error message to user
+            }
+        }
+    }
+
+    when (uiState) {
+        is LoginUiState.Idle -> Unit
+        is LoginUiState.Content -> {
+            val model = (uiState as LoginUiState.Content).uiModel
+            LoginScreenContent(
+                uiModel = model,
+                onEmailChanged = { viewModel.onAction(LoginAction.OnEmailChanged(it)) },
+                onPasswordChanged = { viewModel.onAction(LoginAction.OnPasswordChanged(it)) },
+                onPasswordVisibilityToggled = { viewModel.onAction(LoginAction.OnPasswordVisibilityToggled) },
+                onLoginClick = { viewModel.onAction(LoginAction.OnLoginClicked(model.email, model.password)) },
+                onForgotPasswordClick = { viewModel.onAction(LoginAction.OnForgotPasswordClicked) },
+                onSignUpClick = { viewModel.onAction(LoginAction.OnSignUpClicked) },
+                onBackClick = { viewModel.onAction(LoginAction.OnBackClicked) }
+            )
+        }
+
+        is LoginUiState.Error -> Unit
+    }
+}
+
+@Composable
+private fun LoginScreenContent(
+    uiModel: br.com.hospitalmaps.presentation.login.state.LoginUiModel,
+    onEmailChanged: (String) -> Unit,
+    onPasswordChanged: (String) -> Unit,
+    onPasswordVisibilityToggled: () -> Unit,
+    onLoginClick: () -> Unit,
+    onForgotPasswordClick: () -> Unit,
+    onSignUpClick: () -> Unit,
+    onBackClick: () -> Unit
+) {
 
     Column(
         modifier = Modifier
@@ -84,8 +145,8 @@ fun LoginScreen(
 
         // Email Field
         OutlinedTextField(
-            value = emailState.value,
-            onValueChange = { emailState.value = it },
+            value = uiModel.email,
+            onValueChange = onEmailChanged,
             modifier = Modifier.fillMaxWidth(),
             label = {
                 Text(
@@ -120,8 +181,8 @@ fun LoginScreen(
 
         // Password Field
         OutlinedTextField(
-            value = passwordState.value,
-            onValueChange = { passwordState.value = it },
+            value = uiModel.password,
+            onValueChange = onPasswordChanged,
             modifier = Modifier.fillMaxWidth(),
             label = {
                 Text(
@@ -138,10 +199,10 @@ fun LoginScreen(
             },
             trailingIcon = {
                 IconButton(
-                    onClick = { showPassword.value = !showPassword.value }
+                    onClick = onPasswordVisibilityToggled
                 ) {
                     Icon(
-                        imageVector = if (showPassword.value) {
+                        imageVector = if (uiModel.isPasswordVisible) {
                             VisibilityOffIcon
                         } else {
                             VisibilityIcon
@@ -151,7 +212,7 @@ fun LoginScreen(
                     )
                 }
             },
-            visualTransformation = if (showPassword.value) {
+            visualTransformation = if (uiModel.isPasswordVisible) {
                 VisualTransformation.None
             } else {
                 PasswordVisualTransformation()
@@ -162,7 +223,7 @@ fun LoginScreen(
             ),
             keyboardActions = KeyboardActions(
                 onDone = {
-                    onLoginClick(emailState.value, passwordState.value)
+                    onLoginClick()
                 }
             ),
             singleLine = true,
@@ -194,9 +255,7 @@ fun LoginScreen(
 
         // Login Button
         Button(
-            onClick = {
-                onLoginClick(emailState.value, passwordState.value)
-            },
+            onClick = onLoginClick,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
@@ -207,7 +266,7 @@ fun LoginScreen(
                 disabledContainerColor = MaterialTheme.colorScheme.outline,
                 disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
             ),
-            enabled = emailState.value.isNotEmpty() && passwordState.value.isNotEmpty(),
+            enabled = uiModel.email.isNotEmpty() && uiModel.password.isNotEmpty(),
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
             Text(
@@ -240,7 +299,7 @@ fun LoginScreenPreview() {
     }
 }
 
-@Preview(showBackground = true, device = "id:pixel_5", uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Preview(showBackground = true, device = "id:pixel_5", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun LoginScreenDarkPreview() {
     HospitalMapsAppTheme(darkTheme = true) {
