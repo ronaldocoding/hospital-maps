@@ -27,8 +27,11 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
@@ -40,21 +43,77 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.com.hospitalmaps.R
+import br.com.hospitalmaps.presentation.signup.action.SignUpAction
+import br.com.hospitalmaps.presentation.signup.event.SignUpEvent
+import br.com.hospitalmaps.presentation.signup.state.SignUpUiState
+import br.com.hospitalmaps.presentation.signup.viewmodel.SignUpViewModel
+import br.com.hospitalmaps.shared.utils.ObserveAsEvents
 import br.com.hospitalmaps.shared.utils.VisibilityIcon
 import br.com.hospitalmaps.shared.utils.VisibilityOffIcon
 import br.com.hospitalmaps.ui.theme.HospitalMapsAppTheme
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SignUpScreen(
     onSignUpClick: (email: String, password: String) -> Unit = { _, _ -> },
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    onLoginClick: () -> Unit = {}
 ) {
-    val emailState = remember { mutableStateOf("") }
-    val passwordState = remember { mutableStateOf("") }
-    val confirmPasswordState = remember { mutableStateOf("") }
-    val showPassword = remember { mutableStateOf(false) }
-    val showConfirmPassword = remember { mutableStateOf(false) }
+    val viewModel: SignUpViewModel = koinViewModel()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isInitialized = rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        if (isInitialized.value.not()) viewModel.onAction(SignUpAction.OnInitialized)
+        isInitialized.value = true
+    }
+
+    ObserveAsEvents(viewModel.event) { event ->
+        when (event) {
+            SignUpEvent.NavigateToHome -> onSignUpClick("", "")
+            SignUpEvent.NavigateToLogin -> onLoginClick()
+            SignUpEvent.NavigateBack -> onBackClick()
+            is SignUpEvent.ShowError -> {
+                // TODO: Show error message to user
+            }
+        }
+    }
+
+    when (uiState) {
+        is SignUpUiState.Idle -> Unit
+        is SignUpUiState.Content -> {
+            val model = (uiState as SignUpUiState.Content).uiModel
+            SignUpScreenContent(
+                uiModel = model,
+                onEmailChanged = { viewModel.onAction(SignUpAction.OnEmailChanged(it)) },
+                onPasswordChanged = { viewModel.onAction(SignUpAction.OnPasswordChanged(it)) },
+                onConfirmPasswordChanged = { viewModel.onAction(SignUpAction.OnConfirmPasswordChanged(it)) },
+                onPasswordVisibilityToggled = { viewModel.onAction(SignUpAction.OnPasswordVisibilityToggled) },
+                onConfirmPasswordVisibilityToggled = { viewModel.onAction(SignUpAction.OnConfirmPasswordVisibilityToggled) },
+                onSignUpClick = { viewModel.onAction(SignUpAction.OnSignUpClicked(model.email, model.password, model.confirmPassword)) },
+                onLoginClick = { viewModel.onAction(SignUpAction.OnLoginClicked) },
+                onBackClick = { viewModel.onAction(SignUpAction.OnBackClicked) }
+            )
+        }
+
+        is SignUpUiState.Error -> Unit
+    }
+}
+
+@Composable
+private fun SignUpScreenContent(
+    uiModel: br.com.hospitalmaps.presentation.signup.state.SignUpUiModel,
+    onEmailChanged: (String) -> Unit,
+    onPasswordChanged: (String) -> Unit,
+    onConfirmPasswordChanged: (String) -> Unit,
+    onPasswordVisibilityToggled: () -> Unit,
+    onConfirmPasswordVisibilityToggled: () -> Unit,
+    onSignUpClick: () -> Unit,
+    onLoginClick: () -> Unit,
+    onBackClick: () -> Unit
+) {
 
     Column(
         modifier = Modifier
@@ -85,8 +144,8 @@ fun SignUpScreen(
 
         // Email Field
         OutlinedTextField(
-            value = emailState.value,
-            onValueChange = { emailState.value = it },
+            value = uiModel.email,
+            onValueChange = onEmailChanged,
             modifier = Modifier
                 .fillMaxWidth(),
             label = {
@@ -122,8 +181,8 @@ fun SignUpScreen(
 
         // Password Field
         OutlinedTextField(
-            value = passwordState.value,
-            onValueChange = { passwordState.value = it },
+            value = uiModel.password,
+            onValueChange = onPasswordChanged,
             modifier = Modifier
                 .fillMaxWidth(),
             label = {
@@ -141,10 +200,10 @@ fun SignUpScreen(
             },
             trailingIcon = {
                 IconButton(
-                    onClick = { showPassword.value = !showPassword.value }
+                    onClick = onPasswordVisibilityToggled
                 ) {
                     Icon(
-                        imageVector = if (showPassword.value) {
+                        imageVector = if (uiModel.isPasswordVisible) {
                             VisibilityOffIcon
                         } else {
                             VisibilityIcon
@@ -154,7 +213,7 @@ fun SignUpScreen(
                     )
                 }
             },
-            visualTransformation = if (showPassword.value) {
+            visualTransformation = if (uiModel.isPasswordVisible) {
                 VisualTransformation.None
             } else {
                 PasswordVisualTransformation()
@@ -179,8 +238,8 @@ fun SignUpScreen(
 
         // Confirm Password Field
         OutlinedTextField(
-            value = confirmPasswordState.value,
-            onValueChange = { confirmPasswordState.value = it },
+            value = uiModel.confirmPassword,
+            onValueChange = onConfirmPasswordChanged,
             modifier = Modifier
                 .fillMaxWidth(),
             label = {
@@ -198,10 +257,10 @@ fun SignUpScreen(
             },
             trailingIcon = {
                 IconButton(
-                    onClick = { showConfirmPassword.value = !showConfirmPassword.value }
+                    onClick = onConfirmPasswordVisibilityToggled
                 ) {
                     Icon(
-                        imageVector = if (showConfirmPassword.value) {
+                        imageVector = if (uiModel.isConfirmPasswordVisible) {
                             VisibilityOffIcon
                         } else {
                             VisibilityIcon
@@ -211,7 +270,7 @@ fun SignUpScreen(
                     )
                 }
             },
-            visualTransformation = if (showConfirmPassword.value) {
+            visualTransformation = if (uiModel.isConfirmPasswordVisible) {
                 VisualTransformation.None
             } else {
                 PasswordVisualTransformation()
@@ -222,7 +281,7 @@ fun SignUpScreen(
             ),
             keyboardActions = KeyboardActions(
                 onDone = {
-                    onSignUpClick(emailState.value, passwordState.value)
+                    onSignUpClick()
                 }
             ),
             singleLine = true,
@@ -241,9 +300,7 @@ fun SignUpScreen(
 
         // Sign Up Button
         Button(
-            onClick = {
-                onSignUpClick(emailState.value, passwordState.value)
-            },
+            onClick = onSignUpClick,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
@@ -254,10 +311,10 @@ fun SignUpScreen(
                 disabledContainerColor = MaterialTheme.colorScheme.outline,
                 disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
             ),
-            enabled = emailState.value.isNotEmpty() && 
-                     passwordState.value.isNotEmpty() && 
-                     confirmPasswordState.value.isNotEmpty() &&
-                     passwordState.value == confirmPasswordState.value,
+            enabled = uiModel.email.isNotEmpty() && 
+                     uiModel.password.isNotEmpty() && 
+                     uiModel.confirmPassword.isNotEmpty() &&
+                     uiModel.password == uiModel.confirmPassword,
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
             Text(
@@ -268,9 +325,9 @@ fun SignUpScreen(
         }
 
         // Password Match Error
-        if (passwordState.value.isNotEmpty() && 
-            confirmPasswordState.value.isNotEmpty() && 
-            passwordState.value != confirmPasswordState.value) {
+        if (uiModel.password.isNotEmpty() && 
+            uiModel.confirmPassword.isNotEmpty() && 
+            uiModel.password != uiModel.confirmPassword) {
             Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = stringResource(R.string.signup_password_mismatch_error),

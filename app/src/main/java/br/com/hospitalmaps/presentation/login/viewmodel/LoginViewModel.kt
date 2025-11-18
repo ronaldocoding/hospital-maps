@@ -29,6 +29,7 @@ class LoginViewModel : ViewModel() {
             LoginAction.OnForgotPasswordClicked -> handleOnForgotPasswordClicked()
             LoginAction.OnSignUpClicked -> handleOnSignUpClicked()
             LoginAction.OnBackClicked -> handleOnBackClicked()
+            LoginAction.OnSignUpNavigationClicked -> handleOnSignUpNavigationClicked()
         }
     }
 
@@ -83,6 +84,12 @@ class LoginViewModel : ViewModel() {
     private fun handleOnBackClicked() {
         viewModelScope.launch {
             _event.send(LoginEvent.NavigateBack)
+        }
+    }
+
+    private fun handleOnSignUpNavigationClicked() {
+        viewModelScope.launch {
+            _event.send(LoginEvent.NavigateToSignUpFlow)
         }
     }
 }

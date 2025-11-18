@@ -2,6 +2,7 @@ package br.com.hospitalmaps.presentation.login.view
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -78,6 +79,7 @@ fun LoginScreen(
             LoginEvent.NavigateToForgotPassword -> onForgotPasswordClick()
             LoginEvent.NavigateToSignUp -> onSignUpClick()
             LoginEvent.NavigateBack -> onBackClick()
+            LoginEvent.NavigateToSignUpFlow -> onSignUpClick()
             is LoginEvent.ShowError -> {
                 // TODO: Show error message to user
             }
@@ -287,6 +289,9 @@ private fun LoginScreenContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 16.dp)
+                .clickable(enabled = true) {
+                    onSignUpClick()
+                }
         )
     }
 }

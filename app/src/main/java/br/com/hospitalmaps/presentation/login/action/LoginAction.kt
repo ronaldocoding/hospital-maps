@@ -9,5 +9,6 @@ sealed class LoginAction {
     data object OnForgotPasswordClicked : LoginAction()
     data object OnSignUpClicked : LoginAction()
     data object OnBackClicked : LoginAction()
+    data object OnSignUpNavigationClicked : LoginAction()
 }
 

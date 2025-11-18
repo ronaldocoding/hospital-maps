@@ -14,4 +14,7 @@ object Route {
 
     @Serializable
     data object PersonalInfo
+
+    @Serializable
+    data object SignUp
 }

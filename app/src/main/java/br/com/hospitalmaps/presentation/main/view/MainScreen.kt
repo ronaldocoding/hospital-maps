@@ -18,6 +18,7 @@ import br.com.hospitalmaps.presentation.locationpermission.view.hasLocationPermi
 import br.com.hospitalmaps.presentation.login.view.LoginScreen
 import br.com.hospitalmaps.presentation.main.viewmodel.MainViewModel
 import br.com.hospitalmaps.presentation.navigation.NavigationScreen
+import br.com.hospitalmaps.presentation.signup.SignUpScreen
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -70,9 +71,24 @@ fun MainScreen() {
                 },
                 onSignUpClick = {
                     Log.d("MainScreen", "Navigating to sign up")
-                    // TODO: Navigate to SignUpScreen
+                    navController.navigate(Route.SignUp)
                 },
                 onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable<Route.SignUp> {
+            SignUpScreen(
+                onSignUpClick = { email, password ->
+                    Log.d("MainScreen", "Sign up with email: $email")
+                    // TODO: Handle sign up logic here
+                },
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onLoginClick = {
+                    Log.d("MainScreen", "Navigating back to login")
                     navController.popBackStack()
                 }
             )

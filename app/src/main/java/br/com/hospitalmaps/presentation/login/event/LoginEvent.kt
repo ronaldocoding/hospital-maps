@@ -6,5 +6,6 @@ sealed interface LoginEvent {
     data object NavigateToForgotPassword : LoginEvent
     data object NavigateBack : LoginEvent
     data class ShowError(val message: String) : LoginEvent
+    data object NavigateToSignUpFlow : LoginEvent
 }
 
