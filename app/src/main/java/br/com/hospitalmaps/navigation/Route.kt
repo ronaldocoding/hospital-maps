@@ -13,7 +13,7 @@ object Route {
     data object Navigation
 
     @Serializable
-    data object PersonalInfo
+    data object Login
 
     @Serializable
     data object SignUp

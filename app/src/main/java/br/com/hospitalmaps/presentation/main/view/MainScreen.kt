@@ -55,11 +55,11 @@ fun MainScreen() {
                     navController.navigate(Route.Navigation)
                 },
                 onPersonalInfoClick = {
-                    navController.navigate(Route.PersonalInfo)
+                    navController.navigate(Route.Login)
                 }
             )
         }
-        composable<Route.PersonalInfo> {
+        composable<Route.Login> {
             LoginScreen(
                 onLoginClick = { email, password ->
                     Log.d("MainScreen", "Login with email: $email")
