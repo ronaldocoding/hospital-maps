@@ -95,17 +95,30 @@ fun HomeScreen(
     val viewModel: HomeViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
-    val userLocation = (uiState as? HomeUiState.Success)?.uiModel?.userLocationData
-    val userPoint = LatLng(userLocation?.latitude ?: 0.0, userLocation?.longitude ?: 0.0)
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(userPoint, 10f)
-    }
-
     val isInitialized = rememberSaveable { mutableStateOf(false) }
+
+    val userLocation = (uiState as? HomeUiState.Success)?.uiModel?.userLocationData
+    val userPoint = userLocation?.let { LatLng(it.latitude, it.longitude) }
+
+    val cameraPositionState = rememberCameraPositionState {
+        position = userPoint?.let { point ->
+            CameraPosition.fromLatLngZoom(point, 10f)
+        } ?: CameraPosition.fromLatLngZoom(LatLng(0.0, 0.0), 1f)
+    }
 
     LaunchedEffect(Unit) {
         if (isInitialized.value.not()) viewModel.onAction(HomeAction.OnInitialized)
         isInitialized.value = true
+    }
+
+    LaunchedEffect(userPoint) {
+        if (userPoint != null && userPoint.latitude != 0.0 && userPoint.longitude != 0.0) {
+            cameraPositionState.animate(
+                CameraUpdateFactory.newCameraPosition(
+                    CameraPosition.fromLatLngZoom(userPoint, 10f)
+                )
+            )
+        }
     }
 
     BackHandler { onBackButtonClick.invoke() }
