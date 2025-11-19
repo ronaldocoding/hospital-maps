@@ -6,6 +6,7 @@ import br.com.hospitalmaps.presentation.locationpermission.viewmodel.LocationPer
 import br.com.hospitalmaps.presentation.home.viewmodel.HomeViewModel
 import br.com.hospitalmaps.presentation.login.viewmodel.LoginViewModel
 import br.com.hospitalmaps.presentation.main.viewmodel.MainViewModel
+import br.com.hospitalmaps.presentation.personalinfo.viewmodel.PersonalInfoViewModel
 import br.com.hospitalmaps.presentation.signup.viewmodel.SignUpViewModel
 import com.google.android.gms.location.LocationServices
 import com.google.android.libraries.places.api.Places
@@ -23,5 +24,6 @@ val hospitalMapsModule = module {
     viewModelOf(::LocationPermissionViewModel)
     viewModelOf(::LoginViewModel)
     viewModelOf(::SignUpViewModel)
+    viewModelOf(::PersonalInfoViewModel)
     viewModelOf(::MainViewModel)
 }

@@ -18,6 +18,7 @@ import br.com.hospitalmaps.presentation.locationpermission.view.hasLocationPermi
 import br.com.hospitalmaps.presentation.login.view.LoginScreen
 import br.com.hospitalmaps.presentation.main.viewmodel.MainViewModel
 import br.com.hospitalmaps.presentation.navigation.NavigationScreen
+import br.com.hospitalmaps.presentation.personalinfo.view.PersonalInfoScreen
 import br.com.hospitalmaps.presentation.signup.SignUpScreen
 import org.koin.androidx.compose.koinViewModel
 
@@ -55,7 +56,7 @@ fun MainScreen() {
                     navController.navigate(Route.Navigation)
                 },
                 onPersonalInfoClick = {
-                    navController.navigate(Route.Login)
+                    navController.navigate(Route.PersonalInfo)
                 }
             )
         }
@@ -90,6 +91,25 @@ fun MainScreen() {
                 onLoginClick = {
                     Log.d("MainScreen", "Navigating back to login")
                     navController.popBackStack()
+                }
+            )
+        }
+        composable<Route.PersonalInfo> {
+            PersonalInfoScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onEditMedicinesClick = {
+                    Log.d("MainScreen", "Edit medicines clicked")
+                    // TODO: Navigate to EditMedicinesScreen
+                },
+                onEditAllergiesClick = {
+                    Log.d("MainScreen", "Edit allergies clicked")
+                    // TODO: Navigate to EditAllergiesScreen
+                },
+                onEditDiseasesClick = {
+                    Log.d("MainScreen", "Edit diseases clicked")
+                    // TODO: Navigate to EditDiseasesScreen
                 }
             )
         }
